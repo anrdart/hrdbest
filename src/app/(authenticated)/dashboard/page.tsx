@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { authService, Employee, AttendanceSummary } from '@/services/auth.service';
 import { IconLogout, IconClock, IconLogin, IconLogout2, IconFileText, IconHourglass, IconClockHour4, IconTrophy, IconChecklist, IconNews, IconCash, IconHome, IconFingerprint, IconLayoutGrid, IconCircleCheck, IconCircleX, IconAlertCircle, IconPill, IconBeach, IconId, IconWallet, IconLoader2 } from '@tabler/icons-react';
 import Swal from 'sweetalert2';
+import PushNotificationManager from '@/components/shared/PushNotificationManager';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -215,6 +216,8 @@ export default function DashboardPage() {
             </span>
           </div>
         </div>
+
+        <PushNotificationManager />
 
         {/* ====== ATTENDANCE CARD ====== */}
         <div
