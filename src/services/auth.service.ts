@@ -254,6 +254,7 @@ export const authService = {
         'Accept': 'application/json',
       },
       body: JSON.stringify({ nik, password }),
+      credentials: 'include',
     });
 
     return response.json();
@@ -266,6 +267,7 @@ export const authService = {
         'Authorization': `Bearer ${token}`,
         'Accept': 'application/json',
       },
+      credentials: 'include',
     });
 
     if (!response.ok) {
@@ -289,6 +291,7 @@ export const authService = {
         'Authorization': `Bearer ${token}`,
         'Accept': 'application/json',
       },
+      credentials: 'include',
     });
 
     if (!response.ok) {
@@ -307,6 +310,7 @@ export const authService = {
         'Authorization': `Bearer ${token}`,
         'Accept': 'application/json',
       },
+      credentials: 'include',
     });
 
     if (!response.ok) {
@@ -323,6 +327,7 @@ export const authService = {
         'Authorization': `Bearer ${token}`,
         'Accept': 'application/json',
       },
+      credentials: 'include',
     });
 
     if (!response.ok) {
@@ -341,6 +346,7 @@ export const authService = {
         'Accept': 'application/json',
       },
       body: JSON.stringify(data),
+      credentials: 'include',
     });
 
     return response.json();
@@ -353,6 +359,7 @@ export const authService = {
         'Authorization': `Bearer ${token}`,
         'Accept': 'application/json',
       },
+      credentials: 'include',
     });
 
     if (!response.ok) {
@@ -369,6 +376,7 @@ export const authService = {
         'Authorization': `Bearer ${token}`,
         'Accept': 'application/json',
       },
+      credentials: 'include',
     });
 
     if (!response.ok) {
@@ -385,6 +393,7 @@ export const authService = {
         'Authorization': `Bearer ${token}`,
         'Accept': 'application/json',
       },
+      credentials: 'include',
     });
 
     if (!response.ok) {
@@ -401,6 +410,7 @@ export const authService = {
         'Authorization': `Bearer ${token}`,
         'Accept': 'application/json',
       },
+      credentials: 'include',
     });
 
     if (!response.ok) {
@@ -417,6 +427,7 @@ export const authService = {
         'Authorization': `Bearer ${token}`,
         'Accept': 'application/json',
       },
+      credentials: 'include',
     });
 
     if (!response.ok) {
@@ -433,6 +444,7 @@ export const authService = {
         'Authorization': `Bearer ${token}`,
         'Accept': 'application/json',
       },
+      credentials: 'include',
     });
 
     if (!response.ok) {
@@ -449,6 +461,7 @@ export const authService = {
         'Authorization': `Bearer ${token}`,
         'Accept': 'application/json',
       },
+      credentials: 'include',
     });
 
     if (!response.ok) {
@@ -466,6 +479,7 @@ export const authService = {
         'Accept': 'application/json',
       },
       body: formData,
+      credentials: 'include',
     });
 
     if (!response.ok) {
@@ -483,6 +497,7 @@ export const authService = {
         'Authorization': `Bearer ${token}`,
         'Accept': 'application/json',
       },
+      credentials: 'include',
     });
 
     return response.json();
