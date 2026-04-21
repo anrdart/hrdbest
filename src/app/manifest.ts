@@ -22,5 +22,5 @@ export default function manifest(): MetadataRoute.Manifest {
       },
     ],
     gcm_sender_id: '103953800507',
-  };
+  } as any;
 }

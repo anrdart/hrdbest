@@ -22,9 +22,29 @@ export const pushService = {
       throw new Error('Push messaging is not supported in your browser');
     }
 
+    console.log('Push: Checking Service Worker availability...');
+    const registrations = await navigator.serviceWorker.getRegistrations();
+    console.log('Push: Found registrations:', registrations.length);
+    for (const reg of registrations) {
+      console.log(`Push: SW State: installing=${!!reg.installing}, waiting=${!!reg.waiting}, active=${!!reg.active}`);
+    }
+
+    if (registrations.length === 0) {
+      console.warn('Push: No service worker registered. Retrying registration...');
+      // Small delay before checking ready
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+
     try {
       console.log('Push: Waiting for Service Worker to be ready...');
-      const registration = await navigator.serviceWorker.ready;
+      
+      // Use race for timeout
+      const readyPromise = navigator.serviceWorker.ready;
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Timeout: Service Worker tidak kunjung siap (ready). Coba refresh halaman.')), 10000)
+      );
+
+      const registration = await Promise.race([readyPromise, timeoutPromise]) as ServiceWorkerRegistration;
       console.log('Push: Service Worker is ready', registration);
       
       // Check for existing subscription
