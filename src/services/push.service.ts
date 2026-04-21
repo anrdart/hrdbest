@@ -23,24 +23,41 @@ export const pushService = {
     }
 
     try {
+      console.log('Push: Waiting for Service Worker to be ready...');
       const registration = await navigator.serviceWorker.ready;
+      console.log('Push: Service Worker is ready', registration);
       
       // Check for existing subscription
+      console.log('Push: Checking for existing subscription...');
       let subscription = await registration.pushManager.getSubscription();
       
       if (!subscription) {
+        console.log('Push: No existing subscription found. Subscribing new user...');
         if (!VAPID_PUBLIC_KEY) {
           throw new Error('VAPID public key is not defined in environment variables');
         }
 
         const applicationServerKey = urlBase64ToUint8Array(VAPID_PUBLIC_KEY);
-        subscription = await registration.pushManager.subscribe({
-          userVisibleOnly: true,
-          applicationServerKey: applicationServerKey
-        });
+        try {
+          subscription = await registration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: applicationServerKey
+          });
+          console.log('Push: Subscription successful', subscription);
+        } catch (subError: any) {
+          console.error('Push: Subscribe call failed:', subError);
+          // Special handling for common errors
+          if (subError.name === 'NotAllowedError') {
+            throw new Error('Izin notifikasi ditolak oleh browser');
+          }
+          throw new Error(`Gagal mendaftarkan push service: ${subError.message || 'Error tidak diketahui'}`);
+        }
+      } else {
+        console.log('Push: Existing subscription found', subscription);
       }
 
       // Send subscription to backend
+      console.log('Push: Sending subscription to backend...');
       const response = await fetch(`${API_URL}/push-subscribe`, {
         method: 'POST',
         headers: {
@@ -51,11 +68,14 @@ export const pushService = {
         body: JSON.stringify(subscription),
       });
 
+      const result = await response.json();
+      console.log('Push: Backend response:', result);
+
       if (!response.ok) {
-        throw new Error(`Failed to store subscription on server: ${response.status}`);
+        throw new Error(`Gagal menyimpan ke server: ${result.message || response.status}`);
       }
 
-      return response.json();
+      return result;
     } catch (error: any) {
       console.error('Push Subscription Error:', error);
       throw error;
