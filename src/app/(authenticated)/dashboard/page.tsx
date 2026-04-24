@@ -2,464 +2,468 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import {
+  IconLogin,
+  IconLogout2,
+  IconFileText,
+  IconCash,
+  IconId,
+  IconWallet,
+  IconFingerprint,
+  IconCalendarEvent,
+  IconCircleCheck,
+  IconAlertCircle,
+  IconClock,
+  IconUsers,
+  IconChartBar,
+  IconSettings,
+  IconLoader2,
+} from '@tabler/icons-react';
 import { authService, Employee, AttendanceSummary } from '@/services/auth.service';
-import { IconLogout, IconClock, IconLogin, IconLogout2, IconFileText, IconHourglass, IconClockHour4, IconTrophy, IconChecklist, IconNews, IconCash, IconHome, IconFingerprint, IconLayoutGrid, IconCircleCheck, IconCircleX, IconAlertCircle, IconPill, IconBeach, IconId, IconWallet, IconLoader2 } from '@tabler/icons-react';
-import Swal from 'sweetalert2';
 import PushNotificationManager from '@/components/shared/PushNotificationManager';
 
+/* ───── helpers ───── */
+const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
+function fmtTime(t: string | null | undefined) {
+  return t || '-- : --';
+}
+
+function getStatusMeta(item: any) {
+  if (item.status === 'i') return { color: '#8b5cf6', label: 'Izin', special: true };
+  if (item.status === 's') return { color: '#ec4899', label: 'Sakit', special: true };
+  if (item.status === 'c') return { color: '#06b6d4', label: 'Cuti', special: true };
+  if (item.terlambat_min > 0) return { color: '#ef4444', label: `Telat ${item.terlambat_min}m`, special: false };
+  if (item.pulang_cepat_min > 0) return { color: '#f59e0b', label: 'Pulang Cepat', special: false };
+  return { color: '#22c55e', label: 'Tepat Waktu', special: false };
+}
+
+/* ───── page ───── */
 export default function DashboardPage() {
   const router = useRouter();
   const [user, setUser] = useState<Employee | null>(null);
+  const [role, setRole] = useState<string>(() =>
+    typeof window !== 'undefined' ? authService.getRole() : ''
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
-  const [activeTab, setActiveTab] = useState('beranda');
   const [clock, setClock] = useState<Date | null>(null);
   const [history, setHistory] = useState<any[]>([]);
   const [isHistoryLoading, setIsHistoryLoading] = useState(true);
   const [summary, setSummary] = useState<AttendanceSummary | null>(null);
   const [todayAttendance, setTodayAttendance] = useState<any>(null);
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  // Super Admin specific stats
+  const [totalKaryawan, setTotalKaryawan] = useState<number | null>(null);
+  const [laporanBulanIni, setLaporanBulanIni] = useState<number | null>(null);
+  const [isKaryawanLoading, setIsKaryawanLoading] = useState(false);
+  const [isLaporanLoading, setIsLaporanLoading] = useState(false);
 
-  // Live clock
   useEffect(() => {
     setIsMounted(true);
     setClock(new Date());
-    const timer = setInterval(() => setClock(new Date()), 1000);
-    return () => clearInterval(timer);
+    const t = setInterval(() => setClock(new Date()), 1000);
+    return () => clearInterval(t);
   }, []);
 
   useEffect(() => {
     const token = authService.getToken();
-    const userData = authService.getUserData();
+    if (!token) { router.push('/'); return; }
 
-    if (!token) {
-      router.push('/');
-      return;
-    }
+    const currentRole = authService.getRole();
+    if (currentRole) setRole(currentRole);
 
-    const fetchData = async (authToken: string) => {
+    (async () => {
       try {
+        const userData = authService.getUserData();
         if (userData) {
           setUser(userData);
         } else {
-          const profileResponse = await authService.getProfile(authToken);
-          if (profileResponse.success) {
-            setUser(profileResponse.data);
-            authService.setUserData(profileResponse.data);
+          const p = await authService.getProfile(token);
+          if (p.success) { setUser(p.data); authService.setUserData(p.data); }
+        }
+
+        if (authService.getRole() !== 'super_admin') {
+          const [hist, summ, today] = await Promise.allSettled([
+            authService.getAttendanceHistory(token),
+            authService.getAttendanceSummary(token),
+            authService.getAttendanceToday(token),
+          ]);
+          if (hist.status === 'fulfilled' && hist.value.success) setHistory(hist.value.data);
+          if (summ.status === 'fulfilled' && summ.value.success) setSummary(summ.value.data);
+          if (today.status === 'fulfilled' && today.value.success) setTodayAttendance(today.value.data);
+        } else {
+          // Super Admin: fetch real data for key stats
+          const month = new Date().getMonth() + 1;
+          const year = new Date().getFullYear();
+          try {
+            setIsKaryawanLoading(true);
+            setIsLaporanLoading(true);
+            // Total employees (excluding super_admin)
+            const kResp = await fetch('/api/karyawan', {
+              headers: { 'Authorization': `Bearer ${token}` },
+            });
+            if (kResp.ok) {
+              const kData = await kResp.json();
+              if (kData?.success && Array.isArray(kData.data)) {
+                const total = (kData.data as any[]).filter((u) => u?.role !== 'super_admin').length;
+                setTotalKaryawan(total);
+              }
+            }
+            // Laporan Bulan Ini (attendance history for current month/year)
+            const hResp = await fetch(`/api/attendance-history?bulan=${month}&tahun=${year}`, {
+              headers: { 'Authorization': `Bearer ${token}` },
+            });
+            if (hResp.ok) {
+              const hData = await hResp.json();
+              if (hData?.success && Array.isArray(hData.data)) {
+                setLaporanBulanIni(hData.data.length);
+              }
+            }
+          } catch (_err) {
+            // Ignore fetch errors for optional stats
+          } finally {
+            setIsKaryawanLoading(false);
+            setIsLaporanLoading(false);
           }
         }
-
-        const historyResponse = await authService.getAttendanceHistory(authToken);
-        if (historyResponse.success) {
-          setHistory(historyResponse.data);
-        }
-
-        const summaryResponse = await authService.getAttendanceSummary(authToken);
-        if (summaryResponse.success) {
-          setSummary(summaryResponse.data);
-        }
-
-        const todayResponse = await authService.getAttendanceToday(authToken);
-        if (todayResponse.success) {
-          setTodayAttendance(todayResponse.data);
-        }
-      } catch (error: any) {
-        console.error('Error fetching dashboard data:', error);
-        if (error.message && error.message.includes('401')) {
-          authService.clearToken();
-          router.push('/');
-        }
+      } catch (err: any) {
+        if (err?.message?.includes('401')) { authService.clearToken(); router.push('/'); }
       } finally {
         setIsHistoryLoading(false);
         setIsLoading(false);
       }
-    };
-
-    fetchData(token);
+    })();
   }, [router]);
-
-  const handleLogout = async () => {
-    const result = await Swal.fire({
-      title: 'Keluar Aplikasi?',
-      text: "Anda perlu login kembali untuk mengakses data presensi.",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#1565c0',
-      cancelButtonColor: '#94a3b8',
-      confirmButtonText: 'Ya, Keluar',
-      cancelButtonText: 'Batal',
-      customClass: {
-        popup: 'rounded-2xl',
-        confirmButton: 'rounded-xl px-6 py-3',
-        cancelButton: 'rounded-xl px-6 py-3'
-      }
-    });
-
-    if (result.isConfirmed) {
-      setIsLoggingOut(true);
-      const token = authService.getToken();
-      
-      try {
-        if (token) {
-          await authService.logout(token);
-        }
-      } catch (err) {
-        console.error('Logout error:', err);
-      } finally {
-        authService.clearToken();
-        router.replace('/');
-        setIsLoggingOut(false);
-      }
-    }
-  };
 
   if (isLoading) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100dvh', background: '#ffffff' }}>
-        <p style={{ fontSize: '16px', color: '#6b7280' }}>Loading...</p>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100dvh' }}>
+        <IconLoader2 size={32} color="#1565c0" className="animate-spin" />
       </div>
     );
   }
 
   const now = clock || new Date();
-  const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-  const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-  const dateStr = isMounted ? `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}` : '--, -- --- ----';
-  const timeStr = isMounted && clock ? `${String(clock.getHours()).padStart(2, '0')}:${String(clock.getMinutes()).padStart(2, '0')}:${String(clock.getSeconds()).padStart(2, '0')}` : '--:--:--';
+  const dateStr = isMounted
+    ? `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`
+    : '--, -- --- ----';
+  const timeStr = isMounted && clock
+    ? `${String(clock.getHours()).padStart(2, '0')}:${String(clock.getMinutes()).padStart(2, '0')}:${String(clock.getSeconds()).padStart(2, '0')}`
+    : '--:--:--';
 
-  const formatTime = (time: string | null | undefined) => {
-    if (!time) return '-- : --';
-    try {
-      const date = new Date(time);
-      return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
-    } catch (e) {
-      return '-- : --';
-    }
-  };
-
-  return (
-    <>
-        {/* ====== BLUE HEADER ====== */}
-        <div
-          style={{
-            background: 'linear-gradient(180deg, #0d47a1 0%, #1565c0 60%, #1976d2 100%)',
-            padding: '20px 20px 50px',
-            position: 'relative',
-          }}
-        >
-
-          {/* User info row */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-            <div
-              style={{
-                width: '44px',
-                height: '44px',
-                borderRadius: '50%',
-                background: 'rgba(255,255,255,0.25)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '18px',
-                fontWeight: 700,
-                color: '#ffffff',
-                border: '2px solid rgba(255,255,255,0.4)',
-              }}
-            >
-              {user?.nama_karyawan?.[0] || 'U'}
-            </div>
-            <div style={{ flex: 1 }}>
-              <p style={{ fontSize: '15px', fontWeight: 700, color: '#ffffff' }}>{user?.nama_karyawan || 'User'}</p>
-              <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.8)', fontWeight: 500 }}>
-                {user?.nik} • {user?.nama_jabatan || 'Staff'}
-              </p>
-            </div>
-            <button
-              onClick={handleLogout}
-              disabled={isLoggingOut}
-              style={{
-                background: 'rgba(255,255,255,0.15)',
-                border: 'none',
-                borderRadius: '10px',
-                padding: '8px 10px',
-                cursor: isLoggingOut ? 'not-allowed' : 'pointer',
-                color: '#ffffff',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                transition: 'all 0.2s ease',
-                zIndex: 20
-              }}
-            >
-              {isLoggingOut ? (
-                <IconLoader2 size={18} className="animate-spin" />
-              ) : (
-                <IconLogout size={18} stroke={2} />
-              )}
-            </button>
-          </div>
-
-          {/* Digital Clock */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '4px' }}>
-            <span style={{
-              fontSize: '52px',
-              fontWeight: 900,
-              color: '#ffffff',
-              letterSpacing: '3px',
-              fontVariantNumeric: 'tabular-nums',
-              fontFamily: 'inherit',
-              textShadow: '0 2px 10px rgba(0,0,0,0.15)',
-            }}>
-              {timeStr}
-            </span>
-            <span style={{ fontSize: '14px', color: 'rgba(255,255,255,0.8)', fontWeight: 500, marginTop: '-2px' }}>
-              Hari ini : {dateStr}
-            </span>
-          </div>
-        </div>
-
+  /* ─── Super Admin Dashboard ─── */
+  if (role === 'super_admin') {
+    return (
+      <div style={{ padding: '32px 36px', maxWidth: '1200px' }}>
         <PushNotificationManager />
 
-        {/* ====== ATTENDANCE CARD ====== */}
-        <div
-          style={{
-            margin: '-36px 16px 0',
-            background: '#ffffff',
-            borderRadius: '20px',
-            boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-            padding: '16px',
-            position: 'relative',
-            zIndex: 10,
-          }}
-        >
-          {/* Jam Masuk / Jam Pulang */}
-          <div style={{ display: 'flex', alignItems: 'center', borderRadius: '16px', padding: '16px 0' }}>
-            {/* Jam Masuk */}
-            <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: '#e8eaf6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <IconLogin size={22} color="#1565c0" stroke={2} />
-              </div>
-              <div>
-                <p style={{ fontSize: '13px', fontWeight: 700, color: '#1f2937' }}>Jam Masuk</p>
-                <p style={{ fontSize: '18px', fontWeight: 800, color: todayAttendance?.cek?.jam_in ? '#1f2937' : '#9ca3af', letterSpacing: '2px' }}>
-                  {formatTime(todayAttendance?.cek?.jam_in)}
-                </p>
-              </div>
-            </div>
-            {/* Divider */}
-            <div style={{ width: '1px', height: '40px', background: '#e5e7eb', margin: '0 8px' }} />
-            {/* Jam Pulang */}
-            <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: '#e8eaf6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <IconLogout2 size={22} color="#1565c0" stroke={2} />
-              </div>
-              <div>
-                <p style={{ fontSize: '13px', fontWeight: 700, color: '#1f2937' }}>Jam Pulang</p>
-                <p style={{ fontSize: '18px', fontWeight: 800, color: todayAttendance?.cek?.jam_out ? '#1f2937' : '#9ca3af', letterSpacing: '2px' }}>
-                  {formatTime(todayAttendance?.cek?.jam_out)}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Monthly recap */}
-          <p style={{ fontSize: '14px', fontWeight: 700, color: '#1f2937', textAlign: 'center', marginBottom: '8px' }}>Rekap Absensi Bulan ini</p>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px' }}>
-            {[
-              { label: 'Hadir', value: `${summary?.hadir || 0} Hari`, color: '#22c55e' },
-              { label: 'Izin', value: `${summary?.izin || 0} Hari`, color: '#3b82f6' },
-              { label: 'Sisa Cuti', value: `${summary?.sisa_cuti || 0} kali`, color: '#f59e0b' },
-            ].map((item) => (
-              <div key={item.label} style={{ textAlign: 'center' }}>
-                <p style={{ fontSize: '11px', color: '#9ca3af', marginBottom: '4px' }}>{item.label}</p>
-                <p style={{ fontSize: '15px', fontWeight: 700, color: item.color }}>{item.value}</p>
-                <div style={{ height: '3px', borderRadius: '2px', background: item.color, marginTop: '6px', opacity: 0.7 }} />
-              </div>
-            ))}
-          </div>
+        {/* Page title */}
+        <div style={{ marginBottom: '28px' }}>
+          <h1 style={{ fontSize: '24px', fontWeight: 800, color: '#0f172a', marginBottom: '4px' }}>
+            Selamat Datang, {user?.nama_karyawan?.split(' ')[0] || 'Admin'} 👋
+          </h1>
+          <p style={{ fontSize: '14px', color: '#64748b' }}>{dateStr} — {timeStr}</p>
         </div>
 
-        {/* ====== MENU UTAMA ====== */}
-        <div style={{ padding: '0 16px', flex: 1, marginTop: '20px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
+        {/* Stat cards */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px', marginBottom: '32px' }}>
+          {[
+            { label: 'Total Karyawan', value: (totalKaryawan !== null && !isKaryawanLoading) ? totalKaryawan.toLocaleString() : (isKaryawanLoading ? '...' : '—'), icon: <IconUsers size={22} color="#1565c0" />, bg: '#eff6ff', accent: '#1565c0' },
+            { label: 'Laporan Bulan Ini', value: (laporanBulanIni !== null && !isLaporanLoading) ? laporanBulanIni.toLocaleString() : (isLaporanLoading ? '...' : '—'), icon: <IconChartBar size={22} color="#7c3aed" />, bg: '#f5f3ff', accent: '#7c3aed' },
+            { label: 'Sistem', value: 'Aktif', icon: <IconSettings size={22} color="#0891b2" />, bg: '#ecfeff', accent: '#0891b2' },
+          ].map((s) => (
+            <div
+              key={s.label}
+              style={{
+                background: '#ffffff',
+                border: '1px solid #e2e8f0',
+                borderRadius: '16px',
+                padding: '24px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '16px',
+              }}
+            >
+              <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: s.bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {s.icon}
+              </div>
+              <div>
+                <p style={{ fontSize: '12px', color: '#64748b', marginBottom: '4px' }}>{s.label}</p>
+                <p style={{ fontSize: '22px', fontWeight: 800, color: s.accent }}>{s.value}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Quick links */}
+        <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px' }}>
+          <h2 style={{ fontSize: '16px', fontWeight: 700, color: '#0f172a', marginBottom: '16px' }}>Menu Utama</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
             {[
-              { label: 'Izin', icon: <IconFileText size={24} color="#4f46e5" stroke={1.8} />, bg: '#e0e7ff' },
-              { label: 'ID Card', icon: <IconId size={24} color="#d97706" stroke={1.8} />, bg: '#fef3c7' },
-              { label: 'Slip Gaji', icon: <IconCash size={24} color="#2563eb" stroke={1.8} />, bg: '#dbeafe' },
-              { label: 'Pinjaman', icon: <IconWallet size={24} color="#db2777" stroke={1.8} />, bg: '#fce7f3' },
-            ].map((menu) => (
-              <div
-                key={menu.label}
-                onClick={() => {
-                  if (menu.label === 'Izin') router.push('/izin');
-                  if (menu.label === 'ID Card') router.push('/id-card');
-                  if (menu.label === 'Slip Gaji') router.push('/slip-gaji');
-                  if (menu.label === 'Pinjaman') router.push('/pinjaman');
-                }}
+              { label: 'Manajemen Karyawan', icon: <IconUsers size={24} color="#1565c0" />, bg: '#eff6ff', href: '/karyawan' },
+              { label: 'Laporan Absensi', icon: <IconChartBar size={24} color="#7c3aed" />, bg: '#f5f3ff', href: '/laporan' },
+              { label: 'Pengaturan', icon: <IconSettings size={24} color="#0891b2" />, bg: '#ecfeff', href: '/pengaturan' },
+            ].map((m) => (
+              <button
+                key={m.label}
+                onClick={() => router.push(m.href)}
                 style={{
                   display: 'flex',
-                  flexDirection: 'column',
                   alignItems: 'center',
-                  gap: '8px',
+                  gap: '12px',
+                  padding: '16px',
+                  background: m.bg,
+                  border: 'none',
+                  borderRadius: '12px',
                   cursor: 'pointer',
+                  textAlign: 'left',
                 }}
               >
-                <div
-                  style={{
-                    width: '56px',
-                    height: '56px',
-                    borderRadius: '16px',
-                    background: menu.bg,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-                  }}
-                >
-                  {menu.icon}
-                </div>
-                <span style={{ fontSize: '11px', fontWeight: 600, color: '#4b5563' }}>{menu.label}</span>
-              </div>
+                {m.icon}
+                <span style={{ fontSize: '14px', fontWeight: 600, color: '#1e293b' }}>{m.label}</span>
+              </button>
             ))}
           </div>
         </div>
+      </div>
+    );
+  }
 
-        {/* ====== RIWAYAT PRESENSI ====== */}
-        <div style={{ padding: '24px 16px 20px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-            <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#1f2937' }}>Riwayat Presensi</h3>
-            <button onClick={() => router.push('/history')} style={{ fontSize: '12px', fontWeight: 700, color: '#1565c0', background: 'none', border: 'none', cursor: 'pointer' }}>Lihat Semua</button>
+  /* ─── HRD / Manager Dashboard ─── */
+  const quickMenu = [
+    { label: 'Pengajuan Izin', icon: <IconFileText size={22} color="#4f46e5" />, bg: '#e0e7ff', href: '/izin' },
+    { label: 'ID Card', icon: <IconId size={22} color="#d97706" />, bg: '#fef3c7', href: '/id-card' },
+    { label: 'Slip Gaji', icon: <IconCash size={22} color="#2563eb" />, bg: '#dbeafe', href: '/slip-gaji' },
+    { label: 'Pinjaman', icon: <IconWallet size={22} color="#db2777" />, bg: '#fce7f3', href: '/pinjaman' },
+  ];
+
+  return (
+    <div style={{ padding: '32px 36px', maxWidth: '1400px' }}>
+      <PushNotificationManager />
+
+      {/* Page header */}
+      <div style={{ marginBottom: '28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+        <div>
+          <h1 style={{ fontSize: '22px', fontWeight: 800, color: '#0f172a', marginBottom: '3px' }}>
+            Selamat Datang, {user?.nama_karyawan?.split(' ')[0] || 'Karyawan'} 👋
+          </h1>
+          <p style={{ fontSize: '13px', color: '#64748b' }}>
+            {user?.nik} &bull; {user?.nama_jabatan || 'Staff'} &bull; {user?.nama_cabang || ''}
+          </p>
+        </div>
+        <div style={{ textAlign: 'right' }}>
+          <p style={{ fontSize: '28px', fontWeight: 900, color: '#0f172a', letterSpacing: '2px', fontVariantNumeric: 'tabular-nums' }}>
+            {timeStr}
+          </p>
+          <p style={{ fontSize: '12px', color: '#64748b' }}>{dateStr}</p>
+        </div>
+      </div>
+
+      {/* Two-column main area */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: '24px', alignItems: 'start' }}>
+        {/* LEFT column */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+
+          {/* Attendance summary stats */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
+            {[
+              { label: 'Hadir Bulan Ini', value: `${summary?.hadir ?? '—'} hari`, color: '#22c55e', bg: '#f0fdf4', icon: <IconCircleCheck size={20} color="#22c55e" /> },
+              { label: 'Izin / Sakit / Cuti', value: `${summary?.izin ?? '—'} hari`, color: '#3b82f6', bg: '#eff6ff', icon: <IconFileText size={20} color="#3b82f6" /> },
+              { label: 'Sisa Cuti', value: `${summary?.sisa_cuti ?? '—'} kali`, color: '#f59e0b', bg: '#fffbeb', icon: <IconAlertCircle size={20} color="#f59e0b" /> },
+            ].map((s) => (
+              <div
+                key={s.label}
+                style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '14px', padding: '20px', display: 'flex', alignItems: 'center', gap: '14px' }}
+              >
+                <div style={{ width: '42px', height: '42px', borderRadius: '10px', background: s.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  {s.icon}
+                </div>
+                <div>
+                  <p style={{ fontSize: '11px', color: '#64748b', marginBottom: '3px' }}>{s.label}</p>
+                  <p style={{ fontSize: '18px', fontWeight: 800, color: s.color }}>{s.value}</p>
+                </div>
+              </div>
+            ))}
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          {/* Recent attendance table */}
+          <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', overflow: 'hidden' }}>
+            <div style={{ padding: '18px 24px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h2 style={{ fontSize: '15px', fontWeight: 700, color: '#0f172a' }}>Riwayat Presensi Terkini</h2>
+              <button
+                onClick={() => router.push('/history')}
+                style={{ fontSize: '12px', fontWeight: 600, color: '#1565c0', background: 'none', border: 'none', cursor: 'pointer' }}
+              >
+                Lihat Semua →
+              </button>
+            </div>
+
             {isHistoryLoading ? (
-              <div style={{ textAlign: 'center', padding: '20px', color: '#94a3b8' }}>Memuat data...</div>
+              <div style={{ padding: '40px', textAlign: 'center', color: '#94a3b8' }}>Memuat data...</div>
             ) : history.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '20px', color: '#94a3b8' }}>Belum ada data presensi.</div>
+              <div style={{ padding: '40px', textAlign: 'center', color: '#94a3b8' }}>Belum ada data presensi bulan ini.</div>
             ) : (
-              history.map((item, idx) => {
-                let statusColor = '#22c55e';
-                let isSpecialStatus = false;
-                let statusLabel = item.keterangan || 'Hadir';
-
-                // Map status codes to colors
-                if (item.status === 'h') {
-                  if (item.terlambat_min > 0) {
-                    statusColor = '#ef4444';
-                    statusLabel = `Telat ${item.terlambat_min}m`;
-                  } else if (item.pulang_cepat_min > 0) {
-                    statusColor = '#f59e0b';
-                    statusLabel = 'Pulang Cepat';
-                  } else {
-                    statusColor = '#22c55e';
-                    statusLabel = 'Tepat Waktu';
-                  }
-                } else if (item.status === 'i') {
-                  statusColor = '#8b5cf6';
-                  statusLabel = 'Izin';
-                  isSpecialStatus = true;
-                } else if (item.status === 's') {
-                  statusColor = '#ec4899';
-                  statusLabel = 'Sakit';
-                  isSpecialStatus = true;
-                } else if (item.status === 'c') {
-                  statusColor = '#06b6d4';
-                  statusLabel = 'Cuti';
-                  isSpecialStatus = true;
-                }
-
-                const dayNameShort = item.hari?.substring(0, 3).toUpperCase() || '---';
-                const dateNumber = item.tanggal?.split('-')[2] || '--';
-                const formattedDate = item.tanggal ? new Date(item.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : item.tanggal;
-
-                return (
-                  <div
-                    key={idx}
-                    style={{
-                      background: '#ffffff',
-                      borderRadius: '12px',
-                      padding: '12px 16px',
-                      boxShadow: '0 2px 10px rgba(0,0,0,0.02)',
-                      border: '1px solid #e2e8f0',
-                      borderLeft: `4px solid ${statusColor}`,
-                      display: 'flex',
-                      gap: '12px',
-                      alignItems: 'center',
-                    }}
-                  >
-                    {/* Left Date Box */}
-                    <div style={{ 
-                      width: '48px', 
-                      height: '48px', 
-                      background: statusColor + '10', 
-                      borderRadius: '8px', 
-                      display: 'flex', 
-                      flexDirection: 'column', 
-                      alignItems: 'center', 
-                      justifyContent: 'center',
-                      flexShrink: 0,
-                      border: `1px solid ${statusColor}20`
-                    }}>
-                      <span style={{ fontSize: '9px', fontWeight: 800, color: statusColor }}>{dayNameShort}</span>
-                      <span style={{ fontSize: '18px', fontWeight: 900, color: statusColor, lineHeight: 1 }}>{dateNumber}</span>
-                    </div>
-
-                    {/* Content Section */}
-                    <div style={{ flex: 1 }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2px' }}>
-                        <h4 style={{ fontSize: '13px', fontWeight: 800, color: '#1e293b' }}>{formattedDate}</h4>
-                        <div style={{ 
-                          background: '#f1f5f9', 
-                          padding: '1px 6px', 
-                          borderRadius: '4px', 
-                          fontSize: '8px', 
-                          fontWeight: 700, 
-                          color: '#64748b',
-                        }}>
-                          NON SHIFT
-                        </div>
-                      </div>
-
-                      {!isSpecialStatus ? (
-                        <>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                            <span style={{ fontSize: '12px', fontWeight: 700, color: '#475569' }}>
-                              {item.jam_in || '--:--'} - {item.jam_out || '--:--'}
-                            </span>
-                            <div style={{ 
-                              marginLeft: 'auto',
-                              fontSize: '10px', 
-                              fontWeight: 800, 
-                              color: statusColor,
-                            }}>
-                              {statusLabel}
-                            </div>
-                          </div>
-                          
-                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                            {item.denda > 0 && (
-                              <div style={{ background: '#fef2f2', border: '1px solid #fee2e2', color: '#ef4444', padding: '1px 6px', borderRadius: '4px', fontSize: '9px', fontWeight: 700 }}>
-                                Rp {item.denda.toLocaleString('id-ID')}
-                              </div>
-                            )}
-                            <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', color: '#64748b', padding: '1px 6px', borderRadius: '4px', fontSize: '9px', fontWeight: 700 }}>
-                              PJ: 7.00 Jam
-                            </div>
-                          </div>
-                        </>
-                      ) : (
-                        <div style={{ marginTop: '2px' }}>
-                          <p style={{ fontSize: '12px', fontWeight: 700, color: statusColor }}>
-                            {item.keterangan || `${statusLabel} (Keperluan Pribadi)`}
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                );
-              })
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ background: '#f8fafc' }}>
+                    {['Tanggal', 'Jam Masuk', 'Jam Pulang', 'Status', 'Denda'].map((h) => (
+                      <th key={h} style={{ padding: '10px 16px', textAlign: 'left', fontSize: '11px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                        {h}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {history.slice(0, 10).map((item, idx) => {
+                    const { color, label, special } = getStatusMeta(item);
+                    const fmtDate = item.tanggal
+                      ? new Date(item.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })
+                      : item.tanggal;
+                    return (
+                      <tr key={idx} style={{ borderTop: '1px solid #f1f5f9' }}>
+                        <td style={{ padding: '12px 16px', fontSize: '13px', color: '#1e293b', fontWeight: 500 }}>
+                          {item.hari?.substring(0, 3)}, {fmtDate}
+                        </td>
+                        <td style={{ padding: '12px 16px', fontSize: '13px', color: special ? '#94a3b8' : '#1e293b', fontWeight: 500 }}>
+                          {special ? '—' : (item.jam_in || '—')}
+                        </td>
+                        <td style={{ padding: '12px 16px', fontSize: '13px', color: special ? '#94a3b8' : '#1e293b', fontWeight: 500 }}>
+                          {special ? '—' : (item.jam_out || '—')}
+                        </td>
+                        <td style={{ padding: '12px 16px' }}>
+                          <span style={{ fontSize: '11px', fontWeight: 700, color, background: color + '15', padding: '3px 8px', borderRadius: '6px' }}>
+                            {label}
+                          </span>
+                        </td>
+                        <td style={{ padding: '12px 16px', fontSize: '13px', color: item.denda > 0 ? '#ef4444' : '#94a3b8', fontWeight: item.denda > 0 ? 700 : 400 }}>
+                          {item.denda > 0 ? `Rp ${item.denda.toLocaleString('id-ID')}` : '—'}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             )}
           </div>
         </div>
-    </>
+
+        {/* RIGHT column */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+
+          {/* Today check-in/out card */}
+          <div style={{ background: 'linear-gradient(135deg, #1565c0 0%, #0d47a1 100%)', borderRadius: '16px', padding: '24px', color: '#ffffff' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+              <IconClock size={18} color="rgba(255,255,255,0.8)" />
+              <p style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}>Presensi Hari Ini</p>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
+              <div style={{ background: 'rgba(255,255,255,0.12)', borderRadius: '12px', padding: '14px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
+                  <IconLogin size={14} color="rgba(255,255,255,0.7)" />
+                  <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.7)' }}>Masuk</p>
+                </div>
+                <p style={{ fontSize: '20px', fontWeight: 900, letterSpacing: '1px', color: todayAttendance?.cek?.jam_in ? '#ffffff' : 'rgba(255,255,255,0.4)' }}>
+                  {fmtTime(todayAttendance?.cek?.jam_in)}
+                </p>
+              </div>
+              <div style={{ background: 'rgba(255,255,255,0.12)', borderRadius: '12px', padding: '14px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
+                  <IconLogout2 size={14} color="rgba(255,255,255,0.7)" />
+                  <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.7)' }}>Pulang</p>
+                </div>
+                <p style={{ fontSize: '20px', fontWeight: 900, letterSpacing: '1px', color: todayAttendance?.cek?.jam_out ? '#ffffff' : 'rgba(255,255,255,0.4)' }}>
+                  {fmtTime(todayAttendance?.cek?.jam_out)}
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => router.push('/attendance')}
+              style={{
+                width: '100%',
+                padding: '12px',
+                background: 'rgba(255,255,255,0.2)',
+                border: '1px solid rgba(255,255,255,0.3)',
+                borderRadius: '10px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                color: '#ffffff',
+                fontSize: '13px',
+                fontWeight: 700,
+                transition: 'background 0.15s',
+              }}
+            >
+              <IconFingerprint size={16} />
+              {todayAttendance?.cek?.jam_in
+                ? todayAttendance?.cek?.jam_out
+                  ? 'Presensi Lengkap ✓'
+                  : 'Absen Pulang'
+                : 'Absen Masuk'}
+            </button>
+          </div>
+
+          {/* Quick menu */}
+          <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '20px' }}>
+            <h2 style={{ fontSize: '14px', fontWeight: 700, color: '#0f172a', marginBottom: '14px' }}>Akses Cepat</h2>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+              {quickMenu.map((m) => (
+                <button
+                  key={m.label}
+                  onClick={() => router.push(m.href)}
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '16px 8px',
+                    background: m.bg,
+                    border: 'none',
+                    borderRadius: '12px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  {m.icon}
+                  <span style={{ fontSize: '11px', fontWeight: 600, color: '#374151', textAlign: 'center' }}>{m.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Shift info */}
+          {todayAttendance?.jam_kerja && (
+            <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '20px' }}>
+              <h2 style={{ fontSize: '14px', fontWeight: 700, color: '#0f172a', marginBottom: '12px' }}>Jadwal Hari Ini</h2>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: '12px', color: '#64748b' }}>Jam Kerja</span>
+                  <span style={{ fontSize: '12px', fontWeight: 700, color: '#1e293b' }}>
+                    {todayAttendance.jam_kerja.jam_masuk} – {todayAttendance.jam_kerja.jam_pulang}
+                  </span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: '12px', color: '#64748b' }}>Jadwal</span>
+                  <span style={{ fontSize: '12px', fontWeight: 700, color: '#1e293b' }}>
+                    {todayAttendance.jadwal?.nama_jadwal || '—'}
+                  </span>
+                </div>
+                {todayAttendance.status_wfh && (
+                  <span style={{ fontSize: '11px', fontWeight: 700, color: '#2563eb', background: '#dbeafe', padding: '3px 8px', borderRadius: '6px', display: 'inline-block' }}>
+                    WFH Hari Ini
+                  </span>
+                )}
+                {todayAttendance.status_libur && (
+                  <span style={{ fontSize: '11px', fontWeight: 700, color: '#16a34a', background: '#dcfce7', padding: '3px 8px', borderRadius: '6px', display: 'inline-block' }}>
+                    Hari Libur
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }

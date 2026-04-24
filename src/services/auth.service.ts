@@ -535,5 +535,17 @@ export const authService = {
       return data ? JSON.parse(data) : null;
     }
     return null;
+  },
+
+  getRole(): string {
+    const token = this.getToken();
+    if (!token) return '';
+    try {
+      const payload = token.split('.')[1];
+      const decoded = JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/')));
+      return decoded.role || '';
+    } catch {
+      return '';
+    }
   }
 };

@@ -3,27 +3,46 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { authService, IzinRecord } from '@/services/auth.service';
-import { 
-  IconChevronLeft, 
-  IconPlus, 
-  IconStethoscope, 
-  IconMoodEmpty, 
-  IconBeach, 
-  IconBriefcase, 
-  IconLogout, 
+import {
+  IconStethoscope,
+  IconMoodEmpty,
+  IconBeach,
+  IconBriefcase,
+  IconLogout,
   IconWalk,
   IconCalendarEvent,
   IconClock,
-  IconDotsVertical,
-  IconAlertCircle
+  IconPlus,
+  IconAlertCircle,
+  IconLoader2,
 } from '@tabler/icons-react';
 import IzinSubmissionModal from '@/components/shared/IzinSubmissionModal';
+
+const izinTypes = [
+  { type: 'sakit', label: 'Sakit', icon: <IconStethoscope size={18} />, color: '#ef4444', bg: '#fee2e2' },
+  { type: 'absen', label: 'Absen', icon: <IconMoodEmpty size={18} />, color: '#f59e0b', bg: '#fef3c7' },
+  { type: 'cuti', label: 'Cuti', icon: <IconBeach size={18} />, color: '#3b82f6', bg: '#dbeafe' },
+  { type: 'dinas', label: 'Dinas', icon: <IconBriefcase size={18} />, color: '#10b981', bg: '#d1fae5' },
+  { type: 'pulang', label: 'Pulang Awal', icon: <IconLogout size={18} />, color: '#8b5cf6', bg: '#ede9fe' },
+  { type: 'keluar', label: 'Keluar', icon: <IconWalk size={18} />, color: '#6366f1', bg: '#e0e7ff' },
+];
+
+function getStatusMeta(status: any) {
+  switch (Number(status)) {
+    case 1: return { bg: '#dcfce7', text: '#16a34a', label: 'Disetujui' };
+    case 2: return { bg: '#fee2e2', text: '#ef4444', label: 'Ditolak' };
+    default: return { bg: '#fef3c7', text: '#d97706', label: 'Pending' };
+  }
+}
+
+function getIzinMeta(type: string) {
+  return izinTypes.find(t => t.type === type.toLowerCase()) || izinTypes[0];
+}
 
 export default function IzinPage() {
   const router = useRouter();
   const [history, setHistory] = useState<IzinRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isFabOpen, setIsFabOpen] = useState(false);
   const [selectedType, setSelectedType] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -35,247 +54,167 @@ export default function IzinPage() {
         const res = await authService.getIzin(token);
         setHistory(res.data);
       }
-    } catch (error) {
-      console.error('Failed to fetch history:', error);
-    } finally {
-      setIsLoading(false);
-    }
+    } catch {}
+    finally { setIsLoading(false); }
   };
 
-  useEffect(() => {
-    fetchHistory();
-  }, []);
+  useEffect(() => { fetchHistory(); }, []);
 
-  const getStatusColor = (status: any) => {
-    switch (Number(status)) {
-      case 1: return { bg: '#dcfce7', text: '#16a34a', label: 'Disetujui' };
-      case 2: return { bg: '#fee2e2', text: '#ef4444', label: 'Ditolak' };
-      default: return { bg: '#fef3c7', text: '#d97706', label: 'Pending' };
-    }
-  };
-
-  const getIzinIcon = (type: string) => {
-    switch (type.toLowerCase()) {
-      case 'sakit': return <IconStethoscope size={20} color="#ef4444" />;
-      case 'absen': return <IconMoodEmpty size={20} color="#f59e0b" />;
-      case 'cuti': return <IconBeach size={20} color="#3b82f6" />;
-      case 'dinas': return <IconBriefcase size={20} color="#10b981" />;
-      case 'pulang': return <IconLogout size={20} color="#8b5cf6" />;
-      case 'keluar': return <IconWalk size={20} color="#6366f1" />;
-      default: return <IconCalendarEvent size={20} color="#1565c0" />;
-    }
-  };
-
-  const handleOpenModal = (type: string) => {
-    setSelectedType(type);
-    setIsModalOpen(true);
-    setIsFabOpen(false);
-  };
-
-  const fabItems = [
-    { type: 'sakit', label: 'Sakit', icon: <IconStethoscope size={20} />, color: '#ef4444' },
-    { type: 'absen', label: 'Absen', icon: <IconMoodEmpty size={20} />, color: '#f59e0b' },
-    { type: 'cuti', label: 'Cuti', icon: <IconBeach size={20} />, color: '#3b82f6' },
-    { type: 'dinas', label: 'Dinas', icon: <IconBriefcase size={20} />, color: '#10b981' },
-    { type: 'pulang', label: 'Pulang', icon: <IconLogout size={20} />, color: '#8b5cf6' },
-    { type: 'keluar', label: 'Keluar', icon: <IconWalk size={20} />, color: '#6366f1' },
-  ];
+  const disetujui = history.filter(h => Number(h.status) === 1).length;
+  const ditolak = history.filter(h => Number(h.status) === 2).length;
+  const pending = history.filter(h => !Number(h.status) || Number(h.status) === 0).length;
 
   return (
-    <div style={{ minHeight: '100vh', background: '#f8fafc', paddingBottom: '100px' }}>
+    <div style={{ padding: '32px 36px', maxWidth: '1200px' }}>
+
       {/* Header */}
-      <div style={{ 
-        background: 'white', 
-        padding: '24px 20px 20px', 
-        borderBottomLeftRadius: '24px', 
-        borderBottomRightRadius: '24px',
-        boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
-        position: 'sticky',
-        top: 0,
-        zIndex: 50
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
-          <button 
-            onClick={() => router.back()}
-            style={{ border: 'none', background: '#f1f5f9', width: '40px', height: '40px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-          >
-            <IconChevronLeft size={24} color="#1e293b" />
-          </button>
-          <h2 style={{ fontSize: '18px', fontWeight: 800, color: '#1e293b', margin: 0 }}>Daftar Izin</h2>
-          <div style={{ width: '40px' }} />
+      <div style={{ marginBottom: '24px', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+        <div>
+          <h1 style={{ fontSize: '22px', fontWeight: 800, color: '#0f172a', marginBottom: '4px' }}>Pengajuan Izin</h1>
+          <p style={{ fontSize: '13px', color: '#64748b' }}>Kelola pengajuan izin, cuti, dan absensi Anda</p>
         </div>
       </div>
 
-      {/* Stats Card */}
-      <div style={{ padding: '20px' }}>
-        <div style={{ 
-          background: 'linear-gradient(180deg, #0d47a1 0%, #1565c0 60%, #1976d2 100%)', 
-          borderRadius: '24px', 
-          padding: '20px',
-          color: 'white',
-          boxShadow: '0 8px 20px rgba(30,41,59,0.15)',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}>
-          <div>
-            <p style={{ fontSize: '13px', opacity: 0.8, marginBottom: '4px' }}>Total Pengajuan</p>
-            <h3 style={{ fontSize: '24px', fontWeight: 800, margin: 0 }}>{history.length} <span style={{ fontSize: '14px', fontWeight: 400 }}>Kali</span></h3>
+      {/* Two-column layout */}
+      <div style={{ display: 'grid', gridTemplateColumns: '280px 1fr', gap: '24px', alignItems: 'start' }}>
+
+        {/* LEFT — Submit panel */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+
+          {/* Summary stats */}
+          <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '20px' }}>
+            <p style={{ fontSize: '13px', fontWeight: 700, color: '#64748b', marginBottom: '14px' }}>Ringkasan</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '13px', color: '#475569' }}>Total Pengajuan</span>
+                <span style={{ fontSize: '15px', fontWeight: 800, color: '#0f172a' }}>{history.length}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '13px', color: '#475569' }}>Disetujui</span>
+                <span style={{ fontSize: '13px', fontWeight: 700, color: '#16a34a' }}>{disetujui}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '13px', color: '#475569' }}>Pending</span>
+                <span style={{ fontSize: '13px', fontWeight: 700, color: '#d97706' }}>{pending}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '13px', color: '#475569' }}>Ditolak</span>
+                <span style={{ fontSize: '13px', fontWeight: 700, color: '#ef4444' }}>{ditolak}</span>
+              </div>
+            </div>
           </div>
-          <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <IconCalendarEvent size={24} />
+
+          {/* Submission type buttons */}
+          <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '20px' }}>
+            <p style={{ fontSize: '13px', fontWeight: 700, color: '#64748b', marginBottom: '12px' }}>Buat Pengajuan</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {izinTypes.map(item => (
+                <button
+                  key={item.type}
+                  onClick={() => { setSelectedType(item.type); setIsModalOpen(true); }}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    padding: '10px 14px',
+                    background: item.bg,
+                    border: 'none',
+                    borderRadius: '10px',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    transition: 'opacity 0.15s',
+                  }}
+                >
+                  <span style={{ color: item.color }}>{item.icon}</span>
+                  <span style={{ fontSize: '13px', fontWeight: 600, color: '#1e293b' }}>{item.label}</span>
+                  <IconPlus size={14} color={item.color} style={{ marginLeft: 'auto' }} />
+                </button>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* History List */}
-      <div style={{ padding: '0 20px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-          <h3 style={{ fontSize: '15px', fontWeight: 700, color: '#1e293b', margin: 0 }}>Riwayat Pengajuan</h3>
-          <span style={{ fontSize: '12px', color: '#94a3b8' }}>Urut terbaru</span>
-        </div>
+        {/* RIGHT — History table */}
+        <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', overflow: 'hidden' }}>
+          <div style={{ padding: '18px 24px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <h2 style={{ fontSize: '15px', fontWeight: 700, color: '#0f172a' }}>Riwayat Pengajuan</h2>
+            <span style={{ fontSize: '12px', color: '#94a3b8' }}>Urut terbaru</span>
+          </div>
 
-        {isLoading ? (
-          <div style={{ textAlign: 'center', padding: '40px 0' }}>
-            <div className="animate-spin" style={{ width: '32px', height: '32px', border: '3px solid #e2e8f0', borderTopColor: '#1e293b', borderRadius: '50%', margin: '0 auto' }}></div>
-          </div>
-        ) : history.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '60px 20px', background: 'white', borderRadius: '24px', border: '2px dashed #e2e8f0' }}>
-            <IconAlertCircle size={40} color="#94a3b8" style={{ marginBottom: '12px' }} />
-            <p style={{ fontSize: '14px', color: '#64748b', margin: 0 }}>Belum ada data pengajuan izin.</p>
-          </div>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {history.map((item) => {
-              const status = getStatusColor(item.status);
-              return (
-                <div key={item.id} style={{ 
-                  background: 'white', 
-                  borderRadius: '20px', 
-                  padding: '16px',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.02)',
-                  border: '1px solid #f1f5f9',
-                  display: 'flex',
-                  gap: '16px',
-                  alignItems: 'center'
-                }}>
-                  <div style={{ 
-                    width: '48px', 
-                    height: '48px', 
-                    borderRadius: '14px', 
-                    background: '#f8fafc', 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'center' 
-                  }}>
-                    {getIzinIcon(item.tipe)}
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '4px' }}>
-                      <span style={{ fontSize: '14px', fontWeight: 800, color: '#1e293b' }}>Izin {item.tipe}</span>
-                      <span style={{ 
-                        fontSize: '10px', 
-                        fontWeight: 700, 
-                        padding: '4px 10px', 
-                        borderRadius: '20px', 
-                        background: status.bg, 
-                        color: status.text,
-                        textTransform: 'uppercase'
-                      }}>
-                        {status.label}
-                      </span>
-                    </div>
-                    <p style={{ fontSize: '12px', color: '#64748b', margin: '0 0 6px 0', lineClamp: 1, display: '-webkit-box', WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                      {item.keterangan}
-                    </p>
-                    <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <IconCalendarEvent size={12} color="#94a3b8" />
-                        <span style={{ fontSize: '11px', color: '#94a3b8' }}>{new Date(item.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
-                      </div>
-                      {item.dari !== item.sampai && (
-                         <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                          <IconClock size={12} color="#94a3b8" />
-                          <span style={{ fontSize: '11px', color: '#94a3b8' }}>{Math.ceil((new Date(item.sampai).getTime() - new Date(item.dari).getTime()) / (1000 * 3600 * 24)) + 1} Hari</span>
+          {isLoading ? (
+            <div style={{ padding: '60px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', color: '#94a3b8' }}>
+              <IconLoader2 size={28} className="animate-spin" color="#1565c0" />
+              <p style={{ fontSize: '14px' }}>Memuat data...</p>
+            </div>
+          ) : history.length === 0 ? (
+            <div style={{ padding: '60px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '14px', color: '#94a3b8' }}>
+              <div style={{ width: '64px', height: '64px', background: '#f1f5f9', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <IconAlertCircle size={32} color="#cbd5e1" />
+              </div>
+              <p style={{ fontSize: '14px' }}>Belum ada data pengajuan izin.</p>
+            </div>
+          ) : (
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+                  {['Jenis', 'Tanggal Pengajuan', 'Periode', 'Keterangan', 'Status'].map(h => (
+                    <th key={h} style={{ padding: '11px 16px', textAlign: 'left', fontSize: '11px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px', whiteSpace: 'nowrap' }}>
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {history.map((item, idx) => {
+                  const status = getStatusMeta(item.status);
+                  const meta = getIzinMeta(item.tipe);
+                  const durasi = Math.ceil((new Date(item.sampai).getTime() - new Date(item.dari).getTime()) / (1000 * 3600 * 24)) + 1;
+                  return (
+                    <tr
+                      key={item.id}
+                      style={{ borderTop: idx > 0 ? '1px solid #f1f5f9' : 'none' }}
+                      onMouseEnter={e => (e.currentTarget.style.background = '#fafafa')}
+                      onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                    >
+                      <td style={{ padding: '14px 16px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: meta.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', color: meta.color, flexShrink: 0 }}>
+                            {meta.icon}
+                          </div>
+                          <span style={{ fontSize: '13px', fontWeight: 700, color: '#1e293b' }}>{meta.label}</span>
                         </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
+                      </td>
+                      <td style={{ padding: '14px 16px', fontSize: '13px', color: '#475569', whiteSpace: 'nowrap' }}>
+                        {new Date(item.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+                      </td>
+                      <td style={{ padding: '14px 16px', fontSize: '12px', color: '#64748b', whiteSpace: 'nowrap' }}>
+                        {new Date(item.dari).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
+                        {item.dari !== item.sampai && ` – ${new Date(item.sampai).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}`}
+                        {durasi > 1 && <span style={{ marginLeft: '4px', fontSize: '11px', color: '#94a3b8' }}>({durasi}h)</span>}
+                      </td>
+                      <td style={{ padding: '14px 16px', fontSize: '12px', color: '#64748b', maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {item.keterangan || '—'}
+                      </td>
+                      <td style={{ padding: '14px 16px' }}>
+                        <span style={{ fontSize: '11px', fontWeight: 700, color: status.text, background: status.bg, padding: '4px 10px', borderRadius: '6px' }}>
+                          {status.label}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          )}
+        </div>
       </div>
 
-      {/* Floating Action Button */}
-      {isFabOpen && (
-        <div 
-          onClick={() => setIsFabOpen(false)}
-          style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(4px)', zIndex: 100 }} 
-        />
-      )}
-
-      <div style={{ position: 'fixed', bottom: '100px', right: '20px', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '12px', zIndex: 101 }}>
-        {isFabOpen && fabItems.map((item, index) => (
-          <div 
-            key={item.type} 
-            onClick={() => handleOpenModal(item.type)}
-            style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '12px', 
-              animation: `fabIn 0.3s ease forwards ${index * 0.05}s`,
-              opacity: 0,
-              transform: 'translateY(20px)',
-              cursor: 'pointer'
-            }}
-          >
-            <div style={{ background: 'white', padding: '6px 12px', borderRadius: '10px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', fontSize: '13px', fontWeight: 700, color: '#1e293b' }}>
-              {item.label}
-            </div>
-            <div style={{ width: '44px', height: '44px', borderRadius: '50%', background: item.color, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }}>
-              {item.icon}
-            </div>
-          </div>
-        ))}
-        
-        <button 
-          onClick={() => setIsFabOpen(!isFabOpen)}
-          style={{ 
-            width: '60px', 
-            height: '60px', 
-            borderRadius: '50%', 
-            background: '#1e293b', 
-            color: 'white', 
-            border: 'none', 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center',
-            boxShadow: '0 8px 24px rgba(30,41,59,0.3)',
-            transform: isFabOpen ? 'rotate(45deg)' : 'none',
-            transition: 'all 0.3s ease'
-          }}
-        >
-          <IconPlus size={32} stroke={2.5} />
-        </button>
-      </div>
-
-      <IzinSubmissionModal 
+      <IzinSubmissionModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         type={selectedType || ''}
         onSuccess={fetchHistory}
       />
-
-      <style jsx>{`
-        @keyframes fabIn {
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
     </div>
   );
 }

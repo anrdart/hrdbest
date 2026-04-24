@@ -7,24 +7,15 @@
   -webkit-font-smoothing: antialiased;
 }
 
+html, body {
+  height: 100%;
+}
+
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
 
-.layout-wrapper {
-  min-height: 100dvh;
-  width: 100%;
-  background: white;
-  display: flex;
-  flex-direction: column;
-}
-
-.mobile-container {
-  width: 100%;
-  min-height: 100dvh;
-  background: white;
-  display: flex;
-  flex-direction: column;
-  position: relative;
+.animate-spin {
+  animation: spin 1s linear infinite;
 }

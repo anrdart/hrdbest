@@ -21,8 +21,6 @@ export const metadata: Metadata = {
 export const viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
 };
 
 export default function RootLayout({
@@ -31,17 +29,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id">
+    <html lang="id" suppressHydrationWarning>
       <body className={inter.className} suppressHydrationWarning>
         <div id="app-root" style={{ height: '100%', width: '100%', isolation: 'isolate', ...outfit.style }}>
           {children}
         </div>
         
-        {/* Mobile Debugger - Eruda */}
-        <Script src="https://cdn.jsdelivr.net/npm/eruda" strategy="afterInteractive" />
-        <Script id="eruda-init" strategy="afterInteractive">
-          {`if (typeof eruda !== 'undefined') eruda.init();`}
-        </Script>
       </body>
     </html>
   );

@@ -30,6 +30,22 @@ const formatDecimal = (number: number) => {
   }).format(number);
 };
 
+const DetailRow = ({ label, center = '', right, isTotal = false, isSubData = false }: { label: string, center?: string, right: string | React.ReactNode, isTotal?: boolean, isSubData?: boolean }) => (
+  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', margin: isTotal ? '0' : '0 0 12px 0' }}>
+    <span style={{ color: isTotal ? '#1e293b' : '#64748b', fontWeight: isTotal ? 800 : 600, flex: 2, fontSize: isSubData ? '12px' : '13px' }}>
+      {label}
+    </span>
+    {center && (
+      <span style={{ color: '#94a3b8', fontWeight: 600, flex: 1, textAlign: 'center', fontSize: '12px' }}>
+        {center}
+      </span>
+    )}
+    <span style={{ color: isTotal ? '#1565c0' : '#1e293b', fontWeight: isTotal ? 800 : 700, flex: 1, textAlign: 'right' }}>
+      {right}
+    </span>
+  </div>
+);
+
 export default function SlipGajiDetailPage() {
   const params = useParams();
   const router = useRouter();
@@ -113,9 +129,9 @@ export default function SlipGajiDetailPage() {
 
   if (isLoading) {
     return (
-      <div style={{ minHeight: '100vh', background: '#f8fafc', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '16px' }}>
-        <div className="animate-spin" style={{ width: '40px', height: '40px', border: '3px solid #e2e8f0', borderTopColor: '#1565c0', borderRadius: '50%' }}></div>
-        <p style={{ fontSize: '15px', fontWeight: 600, color: '#64748b' }}>Menghitung Gaji Anda...</p>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100dvh', gap: '12px' }}>
+        <div className="animate-spin" style={{ width: '36px', height: '36px', border: '3px solid #e2e8f0', borderTopColor: '#1565c0', borderRadius: '50%' }}></div>
+        <p style={{ fontSize: '14px', fontWeight: 600, color: '#64748b' }}>Menghitung Gaji Anda...</p>
       </div>
     );
   }
@@ -124,81 +140,38 @@ export default function SlipGajiDetailPage() {
 
   const { summary, employee, start_date, end_date } = data;
 
-  // Custom component for detailed rows
-  const DetailRow = ({ label, center = '', right, isTotal = false, isSubData = false }: { label: string, center?: string, right: string | React.ReactNode, isTotal?: boolean, isSubData?: boolean }) => (
-    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', margin: isTotal ? '0' : '0 0 12px 0' }}>
-      <span style={{ color: isTotal ? '#1e293b' : '#64748b', fontWeight: isTotal ? 800 : 600, flex: 2, fontSize: isSubData ? '12px' : '13px' }}>
-        {label}
-      </span>
-      {center && (
-        <span style={{ color: '#94a3b8', fontWeight: 600, flex: 1, textAlign: 'center', fontSize: '12px' }}>
-          {center}
-        </span>
-      )}
-      <span style={{ color: isTotal ? '#1565c0' : '#1e293b', fontWeight: isTotal ? 800 : 700, flex: 1, textAlign: 'right' }}>
-        {right}
-      </span>
-    </div>
-  );
-
   return (
-    <div style={{ minHeight: '100vh', background: '#f8fafc', paddingBottom: '40px' }}>
-      {/* Header Fixed */}
-      <div
-        style={{
-          background: 'linear-gradient(180deg, #0d47a1 0%, #1565c0 100%)',
-          padding: '20px 16px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          color: 'white',
-          position: 'sticky',
-          top: 0,
-          zIndex: 50,
-          boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+    <div style={{ padding: '32px 36px', maxWidth: '860px' }}>
+
+      {/* Desktop page header */}
+      <div style={{ marginBottom: '28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
           <button
             onClick={() => router.back()}
-            style={{
-              background: 'rgba(255,255,255,0.2)',
-              border: 'none',
-              borderRadius: '12px',
-              width: '40px',
-              height: '40px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              color: 'white'
-            }}
+            style={{ width: '36px', height: '36px', background: '#f1f5f9', border: 'none', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
           >
-            <IconArrowLeft size={20} stroke={2.5} />
+            <IconArrowLeft size={18} color="#475569" />
           </button>
-          <h1 style={{ fontSize: '18px', fontWeight: 700, margin: 0, letterSpacing: '0.5px' }}>Detail Slip Gaji</h1>
+          <div>
+            <h1 style={{ fontSize: '22px', fontWeight: 800, color: '#0f172a', marginBottom: '2px' }}>Detail Slip Gaji</h1>
+            <p style={{ fontSize: '13px', color: '#64748b' }}>Periode: {start_date} – {end_date}</p>
+          </div>
         </div>
         <button
           onClick={handleDownload}
           style={{
-            background: 'white',
-            border: 'none',
-            borderRadius: '12px',
-            width: '40px',
-            height: '40px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            color: '#1565c0',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+            display: 'flex', alignItems: 'center', gap: '8px',
+            padding: '10px 18px', background: '#1565c0', color: '#ffffff',
+            border: 'none', borderRadius: '10px', cursor: 'pointer',
+            fontSize: '13px', fontWeight: 700,
+            boxShadow: '0 2px 8px rgba(21,101,192,0.25)',
           }}
         >
-          <IconDownload size={20} stroke={2.5} />
+          <IconDownload size={16} /> Download PNG
         </button>
       </div>
 
-      <div style={{ padding: '20px 16px' }}>
+      <div>
         <div 
           ref={slipRef}
           style={{ 
@@ -367,3 +340,4 @@ export default function SlipGajiDetailPage() {
     </div>
   );
 }
+
