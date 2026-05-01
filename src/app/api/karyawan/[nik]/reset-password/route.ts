@@ -4,14 +4,14 @@ import { getPool } from '@/lib/db';
 import bcrypt from 'bcryptjs';
 import { verifyToken } from '@/lib/auth';
 
-export async function POST(req: NextRequest, context: { params: { nik: string } }) {
+export async function POST(req: NextRequest, context: { params: Promise<{ nik: string }> }) {
   try {
     const decoded = verifyToken(req);
     if (!decoded || (decoded.role !== 'super_admin' && decoded.role !== 'hrd')) {
       return NextResponse.json({ success: false, message: 'Akses ditolak' }, { status: 403 });
     }
 
-    const { nik } = context.params;
+    const { nik } = await context.params;
     const body = (await req.json()) as { new_password: string };
     const { new_password } = body || {};
     if (!new_password || new_password.length < 6) {

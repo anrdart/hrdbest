@@ -2,13 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifyToken } from '@/lib/auth';
 import { getPool } from '@/lib/db';
 
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const payload = verifyToken(req);
   if (!payload || (payload.role !== 'super_admin' && payload.role !== 'hrd')) {
     return NextResponse.json({ success: false, message: 'Akses ditolak' }, { status: 403 });
   }
 
-  const id = Number(params.id);
+  const { id: idStr } = await params;
+  const id = Number(idStr);
   if (!Number.isFinite(id)) {
     return NextResponse.json({ success: false, message: 'ID tidak valid' }, { status: 400 });
   }

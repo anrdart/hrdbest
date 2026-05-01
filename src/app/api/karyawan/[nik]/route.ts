@@ -4,14 +4,14 @@ import { getPool } from '@/lib/db';
 import { verifyToken } from '@/lib/auth';
 
 // PUT: Update employee by NIK
-export async function PUT(req: NextRequest, context: { params: { nik: string } }) {
+export async function PUT(req: NextRequest, context: { params: Promise<{ nik: string }> }) {
   try {
     const decoded = verifyToken(req);
     if (!decoded || (decoded.role !== 'super_admin' && decoded.role !== 'hrd')) {
       return NextResponse.json({ success: false, message: 'Akses ditolak' }, { status: 403 });
     }
 
-    const { nik } = context.params;
+    const { nik } = await context.params;
     const body = (await req.json()) as {
       name?: string;
       email?: string;
@@ -74,7 +74,7 @@ export async function PUT(req: NextRequest, context: { params: { nik: string } }
 }
 
 // DELETE: Delete employee by NIK
-export async function DELETE(req: NextRequest, context: { params: { nik: string } }) {
+export async function DELETE(req: NextRequest, context: { params: Promise<{ nik: string }> }) {
   try {
     // Ensure the requester is allowed to delete
     const decoded = verifyToken(req);
@@ -82,7 +82,7 @@ export async function DELETE(req: NextRequest, context: { params: { nik: string 
       return NextResponse.json({ success: false, message: 'Akses ditolak' }, { status: 403 });
     }
 
-    const { nik } = context.params;
+    const { nik } = await context.params;
     // Prevent self-deletion if token contains nik
     if (decoded.nik && decoded.nik === nik) {
       return NextResponse.json({ success: false, message: 'Tidak bisa menghapus diri sendiri' }, { status: 403 });
