@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { Pool } from '@neondatabase/serverless';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { getCloudflareContext } from '@opennextjs/cloudflare';
 
 export async function POST(req: Request) {
   try {
@@ -14,14 +15,24 @@ export async function POST(req: Request) {
       );
     }
 
-    if (!process.env.DATABASE_URL) {
+    const env = (() => {
+      try {
+        return getCloudflareContext().env as { DATABASE_URL?: string; JWT_SECRET?: string };
+      } catch {
+        return {} as { DATABASE_URL?: string; JWT_SECRET?: string };
+      }
+    })();
+    const databaseUrl = env.DATABASE_URL ?? process.env.DATABASE_URL;
+    const jwtSecret = env.JWT_SECRET ?? process.env.JWT_SECRET ?? 'fallback_secret_key';
+
+    if (!databaseUrl) {
       return NextResponse.json(
         { success: false, message: 'Koneksi database (DATABASE_URL) belum diatur di server.' },
         { status: 500 }
       );
     }
 
-    const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+    const pool = new Pool({ connectionString: databaseUrl });
     
     const result = await pool.query('SELECT * FROM users WHERE nik = $1', [nik]);
     const user = result.rows[0];
@@ -50,7 +61,7 @@ export async function POST(req: Request) {
         nik: user.nik, 
         role: user.role 
       },
-      process.env.JWT_SECRET || 'fallback_secret_key',
+      jwtSecret,
       { expiresIn: '1d' }
     );
 
