@@ -32,7 +32,7 @@ const CardFront = ({ user, imgError, setImgError, isFixed = false }: { user: Emp
         <div style={{ width: '100%', height: '100%', borderRadius: '50%', background: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
           {(() => {
             const photoUrl = user?.foto
-              ? `${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '')}/storage/karyawan/${user.foto}`
+              ? `${(process.env.NEXT_PUBLIC_API_URL ?? '/api').replace('/api', '')}/storage/karyawan/${user.foto}`
               : null;
             return photoUrl && !imgError ? (
               <img src={photoUrl} alt="Photo" crossOrigin="anonymous" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={() => setImgError(true)} />
@@ -135,7 +135,7 @@ export default function IDCardPage() {
   };
 
   const photoUrl = user?.foto
-    ? `${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '')}/storage/karyawan/${user.foto}`
+    ? `${(process.env.NEXT_PUBLIC_API_URL ?? '/api').replace('/api', '')}/storage/karyawan/${user.foto}`
     : null;
 
   
