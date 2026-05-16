@@ -139,7 +139,7 @@ export default function DashboardPage() {
   if (isLoading) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100dvh' }}>
-        <IconLoader2 size={32} color="#1565c0" className="animate-spin" />
+        <IconLoader2 size={32} color="#c3282f" className="animate-spin" />
       </div>
     );
   }
@@ -169,7 +169,7 @@ export default function DashboardPage() {
         {/* Stat cards */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px', marginBottom: '32px' }}>
           {[
-            { label: 'Total Karyawan', value: (totalKaryawan !== null && !isKaryawanLoading) ? totalKaryawan.toLocaleString() : (isKaryawanLoading ? '...' : '—'), icon: <IconUsers size={22} color="#1565c0" />, bg: '#eff6ff', accent: '#1565c0' },
+            { label: 'Total Karyawan', value: (totalKaryawan !== null && !isKaryawanLoading) ? totalKaryawan.toLocaleString() : (isKaryawanLoading ? '...' : '—'), icon: <IconUsers size={22} color="#c3282f" />, bg: '#fceaeb', accent: '#c3282f' },
             { label: 'Laporan Bulan Ini', value: (laporanBulanIni !== null && !isLaporanLoading) ? laporanBulanIni.toLocaleString() : (isLaporanLoading ? '...' : '—'), icon: <IconChartBar size={22} color="#7c3aed" />, bg: '#f5f3ff', accent: '#7c3aed' },
             { label: 'Sistem', value: 'Aktif', icon: <IconSettings size={22} color="#0891b2" />, bg: '#ecfeff', accent: '#0891b2' },
           ].map((s) => (
@@ -201,7 +201,7 @@ export default function DashboardPage() {
           <h2 style={{ fontSize: '16px', fontWeight: 700, color: '#0f172a', marginBottom: '16px' }}>Menu Utama</h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
             {[
-              { label: 'Manajemen Karyawan', icon: <IconUsers size={24} color="#1565c0" />, bg: '#eff6ff', href: '/karyawan' },
+              { label: 'Manajemen Karyawan', icon: <IconUsers size={24} color="#c3282f" />, bg: '#fceaeb', href: '/karyawan' },
               { label: 'Laporan Absensi', icon: <IconChartBar size={24} color="#7c3aed" />, bg: '#f5f3ff', href: '/laporan' },
               { label: 'Pengaturan', icon: <IconSettings size={24} color="#0891b2" />, bg: '#ecfeff', href: '/pengaturan' },
             ].map((m) => (
@@ -269,7 +269,7 @@ export default function DashboardPage() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
             {[
               { label: 'Hadir Bulan Ini', value: `${summary?.hadir ?? '—'} hari`, color: '#22c55e', bg: '#f0fdf4', icon: <IconCircleCheck size={20} color="#22c55e" /> },
-              { label: 'Izin / Sakit / Cuti', value: `${summary?.izin ?? '—'} hari`, color: '#3b82f6', bg: '#eff6ff', icon: <IconFileText size={20} color="#3b82f6" /> },
+              { label: 'Izin / Sakit / Cuti', value: `${summary?.izin ?? '—'} hari`, color: '#d2a418', bg: '#fceaeb', icon: <IconFileText size={20} color="#d2a418" /> },
               { label: 'Sisa Cuti', value: `${summary?.sisa_cuti ?? '—'} kali`, color: '#f59e0b', bg: '#fffbeb', icon: <IconAlertCircle size={20} color="#f59e0b" /> },
             ].map((s) => (
               <div
@@ -293,7 +293,7 @@ export default function DashboardPage() {
               <h2 style={{ fontSize: '15px', fontWeight: 700, color: '#0f172a' }}>Riwayat Presensi Terkini</h2>
               <button
                 onClick={() => router.push('/history')}
-                style={{ fontSize: '12px', fontWeight: 600, color: '#1565c0', background: 'none', border: 'none', cursor: 'pointer' }}
+                style={{ fontSize: '12px', fontWeight: 600, color: '#c3282f', background: 'none', border: 'none', cursor: 'pointer' }}
               >
                 Lihat Semua →
               </button>
@@ -352,7 +352,7 @@ export default function DashboardPage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
           {/* Today check-in/out card */}
-          <div style={{ background: 'linear-gradient(135deg, #1565c0 0%, #0d47a1 100%)', borderRadius: '16px', padding: '24px', color: '#ffffff' }}>
+          <div style={{ background: 'linear-gradient(135deg, #c3282f 0%, #a11f25 100%)', borderRadius: '16px', padding: '24px', color: '#ffffff' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
               <IconClock size={18} color="rgba(255,255,255,0.8)" />
               <p style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}>Presensi Hari Ini</p>

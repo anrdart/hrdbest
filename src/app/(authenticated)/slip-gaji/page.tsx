@@ -6,7 +6,7 @@ import { authService, SlipMonth } from '@/services/auth.service';
 import { IconCalendarEvent, IconFileText, IconChevronRight, IconLoader2 } from '@tabler/icons-react';
 
 const monthColors = [
-  { bg: '#eff6ff', accent: '#1565c0' },
+  { bg: '#fceaeb', accent: '#c3282f' },
   { bg: '#f5f3ff', accent: '#7c3aed' },
   { bg: '#f0fdf4', accent: '#16a34a' },
   { bg: '#fff7ed', accent: '#c2410c' },
@@ -14,7 +14,7 @@ const monthColors = [
   { bg: '#fdf2f8', accent: '#be185d' },
   { bg: '#fefce8', accent: '#a16207' },
   { bg: '#f0fdf4', accent: '#15803d' },
-  { bg: '#eff6ff', accent: '#1d4ed8' },
+  { bg: '#fceaeb', accent: '#1d4ed8' },
   { bg: '#fff5f5', accent: '#dc2626' },
   { bg: '#f5f3ff', accent: '#6d28d9' },
   { bg: '#ecfeff', accent: '#0e7490' },
@@ -48,7 +48,7 @@ export default function SlipGajiPage() {
 
       {isLoading ? (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', padding: '60px', color: '#94a3b8' }}>
-          <IconLoader2 size={28} className="animate-spin" color="#1565c0" />
+          <IconLoader2 size={28} className="animate-spin" color="#c3282f" />
           <p style={{ fontSize: '14px' }}>Memuat daftar bulan...</p>
         </div>
       ) : months.length === 0 ? (

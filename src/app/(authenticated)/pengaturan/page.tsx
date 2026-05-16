@@ -72,7 +72,7 @@ interface SettingsData {
 /* ───── role helpers ───── */
 const roleBadgeColor: Record<string, string> = {
   super_admin: '#7c3aed',
-  hrd: '#1565c0',
+  hrd: '#c3282f',
   manager: '#0891b2',
   employee: '#475569',
 };
@@ -307,7 +307,7 @@ export default function PengaturanPage() {
         {/* ─── Section 1: Profil Sistem ─── */}
         <div style={card}>
           <h2 style={sectionHeader}>
-            <IconInfoCircle size={18} color="#1565c0" />
+            <IconInfoCircle size={18} color="#c3282f" />
             Profil Sistem
           </h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -336,13 +336,13 @@ export default function PengaturanPage() {
         {/* ─── Section 2: Manajemen Karyawan ─── */}
         <div style={card}>
           <h2 style={sectionHeader}>
-            <IconUsers size={18} color="#1565c0" />
+            <IconUsers size={18} color="#c3282f" />
             Manajemen Karyawan
           </h2>
 
           {isLoading ? (
             <div style={{ padding: '40px', textAlign: 'center' }}>
-              <IconLoader2 size={24} color="#1565c0" className="animate-spin" />
+              <IconLoader2 size={24} color="#c3282f" className="animate-spin" />
               <p style={{ fontSize: '13px', color: '#94a3b8', marginTop: '12px' }}>
                 Memuat data karyawan...
               </p>
@@ -439,13 +439,13 @@ export default function PengaturanPage() {
         {/* ─── Section 3: Jadwal Kerja Default (editable) ─── */}
         <div style={card}>
           <h2 style={sectionHeader}>
-            <IconClock size={18} color="#1565c0" />
+            <IconClock size={18} color="#c3282f" />
             Jadwal Kerja Default
           </h2>
 
           {!isSettingsLoaded ? (
             <div style={{ padding: '24px', textAlign: 'center' }}>
-              <IconLoader2 size={20} color="#1565c0" className="animate-spin" />
+              <IconLoader2 size={20} color="#c3282f" className="animate-spin" />
               <p style={{ fontSize: '13px', color: '#94a3b8', marginTop: '10px' }}>
                 Memuat pengaturan...
               </p>
@@ -503,7 +503,7 @@ export default function PengaturanPage() {
                     fontSize: '13px',
                     fontWeight: 700,
                     color: '#ffffff',
-                    background: isSaving ? '#93c5fd' : '#1565c0',
+                    background: isSaving ? '#e8a0a0' : '#c3282f',
                     border: 'none',
                     borderRadius: '8px',
                     padding: '8px 18px',

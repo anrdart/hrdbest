@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { authService } from '@/services/auth.service';
-import { IconBuilding, IconLock, IconId, IconLoader2, IconEye, IconEyeOff } from '@tabler/icons-react';
+import { IconLock, IconId, IconLoader2, IconEye, IconEyeOff } from '@tabler/icons-react';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -45,7 +45,7 @@ export default function LoginPage() {
       <div style={{
         width: '420px',
         flexShrink: 0,
-        background: 'linear-gradient(160deg, #0d47a1 0%, #1565c0 50%, #1976d2 100%)',
+        background: 'linear-gradient(160deg, #a11f25 0%, #c3282f 50%, #d2a418 100%)',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -60,15 +60,15 @@ export default function LoginPage() {
 
         <div style={{ position: 'relative', zIndex: 1, textAlign: 'center' }}>
           {/* Logo */}
-          <div style={{ width: '80px', height: '80px', background: 'rgba(255,255,255,0.15)', borderRadius: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px', border: '1px solid rgba(255,255,255,0.2)' }}>
-            <IconBuilding size={40} color="#ffffff" stroke={1.5} />
+          <div style={{ margin: '0 auto 24px', maxWidth: '240px' }}>
+            <img src="/logo-text.webp" alt="Mediapro Digital Creative Limited" style={{ width: '100%', height: 'auto' }} />
           </div>
 
           <h1 style={{ fontSize: '26px', fontWeight: 900, color: '#ffffff', marginBottom: '8px', letterSpacing: '-0.3px' }}>
             Portal Karyawan
           </h1>
           <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.75)', lineHeight: '1.6', marginBottom: '40px' }}>
-            CV. Makmur Permata<br />
+            Mediapro Digital Creative Limited<br />
             Sistem Manajemen Karyawan
           </p>
 
@@ -137,7 +137,7 @@ export default function LoginPage() {
                     transition: 'border-color 0.15s',
                     boxSizing: 'border-box',
                   }}
-                  onFocus={e => (e.target.style.borderColor = '#1565c0')}
+                  onFocus={e => (e.target.style.borderColor = '#c3282f')}
                   onBlur={e => (e.target.style.borderColor = '#e2e8f0')}
                 />
               </div>
@@ -171,7 +171,7 @@ export default function LoginPage() {
                     transition: 'border-color 0.15s',
                     boxSizing: 'border-box',
                   }}
-                  onFocus={e => (e.target.style.borderColor = '#1565c0')}
+                  onFocus={e => (e.target.style.borderColor = '#c3282f')}
                   onBlur={e => (e.target.style.borderColor = '#e2e8f0')}
                 />
                 <button
@@ -193,7 +193,7 @@ export default function LoginPage() {
                 marginTop: '8px',
                 border: 'none',
                 borderRadius: '10px',
-                background: isLoading ? '#94a3b8' : 'linear-gradient(135deg, #1565c0, #0d47a1)',
+                background: isLoading ? '#94a3b8' : 'linear-gradient(135deg, #c3282f, #a11f25)',
                 color: '#ffffff',
                 fontSize: '15px',
                 fontWeight: 700,

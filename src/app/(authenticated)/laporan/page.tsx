@@ -86,7 +86,7 @@ export default function LaporanPage() {
   /* ───── stat card definition ───── */
   const stats = [
     { label: 'Total Hadir', value: totalHadir, color: '#22c55e', bg: '#f0fdf4', icon: <IconUsers size={20} color="#22c55e" /> },
-    { label: 'Izin / Sakit / Cuti', value: totalIzinSakitCuti, color: '#3b82f6', bg: '#eff6ff', icon: <IconCalendar size={20} color="#3b82f6" /> },
+    { label: 'Izin / Sakit / Cuti', value: totalIzinSakitCuti, color: '#d2a418', bg: '#fceaeb', icon: <IconCalendar size={20} color="#d2a418" /> },
     { label: 'Total Terlambat', value: totalTerlambat, color: '#ef4444', bg: '#fef2f2', icon: <IconAlertTriangle size={20} color="#ef4444" /> },
     { label: 'Pulang Cepat', value: totalPulangCepat, color: '#f59e0b', bg: '#fffbeb', icon: <IconChartBar size={20} color="#f59e0b" /> },
   ];
@@ -219,7 +219,7 @@ export default function LaporanPage() {
 
         {isLoading ? (
           <div style={{ padding: '60px', textAlign: 'center' }}>
-            <IconLoader2 size={28} color="#1565c0" className="animate-spin" style={{ margin: '0 auto 12px' }} />
+            <IconLoader2 size={28} color="#c3282f" className="animate-spin" style={{ margin: '0 auto 12px' }} />
             <p style={{ fontSize: '13px', color: '#94a3b8' }}>Memuat data presensi...</p>
           </div>
         ) : error ? (
@@ -231,7 +231,7 @@ export default function LaporanPage() {
               style={{
                 fontSize: '12px',
                 fontWeight: 600,
-                color: '#1565c0',
+                color: '#c3282f',
                 background: 'none',
                 border: 'none',
                 cursor: 'pointer',

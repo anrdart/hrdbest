@@ -12,7 +12,7 @@ const CardFront = ({ user, imgError, setImgError, isFixed = false }: { user: Emp
   <div style={{
     width: isFixed ? '320px' : '100%', height: isFixed ? '508px' : '100%',
     borderRadius: '24px', overflow: 'hidden',
-    background: 'linear-gradient(145deg, #1565c0, #0d47a1)',
+    background: 'linear-gradient(145deg, #c3282f, #a11f25)',
     display: 'flex', flexDirection: 'column', position: 'relative',
     boxShadow: isFixed ? 'none' : '0 20px 48px rgba(13,71,161,0.3)'
   }}>
@@ -21,9 +21,9 @@ const CardFront = ({ user, imgError, setImgError, isFixed = false }: { user: Emp
     <div style={{ padding: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', zIndex: 1 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
         <div style={{ width: '28px', height: '28px', background: '#ffffff', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <IconIdBadge2 size={18} color="#1565c0" />
+          <IconIdBadge2 size={18} color="#c3282f" />
         </div>
-        <span style={{ fontSize: '12px', fontWeight: 900, color: '#ffffff', letterSpacing: '0.5px' }}>CV. MAKMUR PERMATA</span>
+        <span style={{ fontSize: '12px', fontWeight: 900, color: '#ffffff', letterSpacing: '0.5px' }}>MEDIAPRO DIGITAL</span>
       </div>
       <IconScan size={20} color="rgba(255,255,255,0.5)" />
     </div>
@@ -72,13 +72,13 @@ const CardBack = ({ user, isFixed = false }: { user: Employee | null; isFixed?: 
   }}>
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', marginBottom: '24px' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-        <IconIdBadge2 size={24} color="#1565c0" />
-        <span style={{ fontSize: '14px', fontWeight: 900, color: '#1565c0' }}>CV. MAKMUR PERMATA</span>
+        <IconIdBadge2 size={24} color="#c3282f" />
+        <span style={{ fontSize: '14px', fontWeight: 900, color: '#c3282f' }}>MEDIAPRO DIGITAL</span>
       </div>
       <span style={{ fontSize: '9px', color: '#94a3b8', fontWeight: 600 }}>Jln. Perintis Kemerdekaan No. 160</span>
     </div>
     <div style={{ background: '#f8fafc', padding: '24px', borderRadius: '20px', border: '1px dashed #cbd5e1', marginBottom: '24px' }}>
-      <QRCodeSVG value={user?.nik || 'CV-MAKMUR-PERMATA'} size={160} level="H" includeMargin={false} />
+      <QRCodeSVG value={user?.nik || 'MEDIAPRO-DIGITAL'} size={160} level="H" includeMargin={false} />
     </div>
     <p style={{ fontSize: '11px', color: '#64748b', textAlign: 'center', lineHeight: '1.6', margin: 0 }}>
       Kartu ini adalah kartu identitas resmi karyawan. Jika ditemukan, mohon hubungi HRD Department atau kembalikan ke kantor pusat terdekat.
@@ -90,7 +90,7 @@ const CardBack = ({ user, isFixed = false }: { user: Employee | null; isFixed?: 
       </div>
       <div style={{ height: '1px', background: '#f1f5f9' }} />
       <div style={{ fontSize: '10px', color: '#94a3b8', textAlign: 'center', fontWeight: 600 }}>
-        Property of CV. MAKMUR PERMATA • {new Date().getFullYear()}
+        Property of MEDIAPRO DIGITAL • {new Date().getFullYear()}
       </div>
     </div>
   </div>
@@ -145,7 +145,7 @@ export default function IDCardPage() {
   if (isLoading) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '80dvh' }}>
-        <IconLoader2 size={32} color="#1565c0" className="animate-spin" />
+        <IconLoader2 size={32} color="#c3282f" className="animate-spin" />
       </div>
     );
   }
@@ -197,7 +197,7 @@ export default function IDCardPage() {
           {/* User info card */}
           <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '20px' }}>
-              <div style={{ width: '60px', height: '60px', borderRadius: '50%', background: 'linear-gradient(135deg, #1565c0, #0d47a1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '22px', fontWeight: 800, color: '#ffffff' }}>
+              <div style={{ width: '60px', height: '60px', borderRadius: '50%', background: 'linear-gradient(135deg, #c3282f, #a11f25)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '22px', fontWeight: 800, color: '#ffffff' }}>
                 {user?.nama_karyawan?.[0] || 'U'}
               </div>
               <div>
@@ -226,7 +226,7 @@ export default function IDCardPage() {
             style={{
               width: '100%', padding: '16px',
               borderRadius: '12px',
-              background: isDownloading ? '#94a3b8' : '#1565c0',
+              background: isDownloading ? '#94a3b8' : '#c3282f',
               color: '#ffffff', border: 'none',
               fontSize: '14px', fontWeight: 800,
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px',

@@ -21,7 +21,7 @@ import IzinSubmissionModal from '@/components/shared/IzinSubmissionModal';
 const izinTypes = [
   { type: 'sakit', label: 'Sakit', icon: <IconStethoscope size={18} />, color: '#ef4444', bg: '#fee2e2' },
   { type: 'absen', label: 'Absen', icon: <IconMoodEmpty size={18} />, color: '#f59e0b', bg: '#fef3c7' },
-  { type: 'cuti', label: 'Cuti', icon: <IconBeach size={18} />, color: '#3b82f6', bg: '#dbeafe' },
+  { type: 'cuti', label: 'Cuti', icon: <IconBeach size={18} />, color: '#d2a418', bg: '#dbeafe' },
   { type: 'dinas', label: 'Dinas', icon: <IconBriefcase size={18} />, color: '#10b981', bg: '#d1fae5' },
   { type: 'pulang', label: 'Pulang Awal', icon: <IconLogout size={18} />, color: '#8b5cf6', bg: '#ede9fe' },
   { type: 'keluar', label: 'Keluar', icon: <IconWalk size={18} />, color: '#6366f1', bg: '#e0e7ff' },
@@ -143,7 +143,7 @@ export default function IzinPage() {
 
           {isLoading ? (
             <div style={{ padding: '60px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', color: '#94a3b8' }}>
-              <IconLoader2 size={28} className="animate-spin" color="#1565c0" />
+              <IconLoader2 size={28} className="animate-spin" color="#c3282f" />
               <p style={{ fontSize: '14px' }}>Memuat data...</p>
             </div>
           ) : history.length === 0 ? (

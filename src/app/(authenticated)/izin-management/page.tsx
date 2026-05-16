@@ -232,7 +232,7 @@ export default function IzinManagementPage() {
   const approvedCount = requests.filter((r) => r.status === 'approved').length;
 
   const stats = [
-    { label: 'Total Pengajuan', value: totalRequests, color: '#1565c0', bg: '#eff6ff', icon: <IconFileCheck size={20} color="#1565c0" /> },
+    { label: 'Total Pengajuan', value: totalRequests, color: '#c3282f', bg: '#fceaeb', icon: <IconFileCheck size={20} color="#c3282f" /> },
     { label: 'Menunggu Persetujuan', value: pendingCount, color: '#f59e0b', bg: '#fffbeb', icon: <IconClock size={20} color="#f59e0b" /> },
     { label: 'Disetujui', value: approvedCount, color: '#22c55e', bg: '#f0fdf4', icon: <IconCheck size={20} color="#22c55e" /> },
   ];
@@ -281,7 +281,7 @@ export default function IzinManagementPage() {
                 border: 'none',
                 cursor: 'pointer',
                 transition: 'all 0.15s ease',
-                background: active ? '#1565c0' : '#f1f5f9',
+                background: active ? '#c3282f' : '#f1f5f9',
                 color: active ? '#ffffff' : '#475569',
               }}
             >
@@ -346,7 +346,7 @@ export default function IzinManagementPage() {
 
         {isLoading ? (
           <div style={{ padding: '60px', textAlign: 'center' }}>
-            <IconLoader2 size={28} color="#1565c0" className="animate-spin" style={{ margin: '0 auto 12px' }} />
+            <IconLoader2 size={28} color="#c3282f" className="animate-spin" style={{ margin: '0 auto 12px' }} />
             <p style={{ fontSize: '13px', color: '#94a3b8' }}>Memuat data pengajuan...</p>
           </div>
         ) : error ? (
@@ -358,7 +358,7 @@ export default function IzinManagementPage() {
               style={{
                 fontSize: '12px',
                 fontWeight: 600,
-                color: '#1565c0',
+                color: '#c3282f',
                 background: 'none',
                 border: 'none',
                 cursor: 'pointer',
@@ -418,8 +418,8 @@ export default function IzinManagementPage() {
                           style={{
                             fontSize: '11px',
                             fontWeight: 700,
-                            color: '#3b82f6',
-                            background: '#eff6ff',
+                            color: '#d2a418',
+                            background: '#fceaeb',
                             padding: '3px 8px',
                             borderRadius: '6px',
                           }}

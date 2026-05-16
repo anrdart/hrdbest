@@ -4,11 +4,11 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: 'Portal Attendance',
     short_name: 'Portal',
-    description: 'Sistem Presensi Modern CV. Makmur Permata',
+    description: 'Sistem Presensi Modern Mediapro Digital Creative Limited',
     start_url: '/dashboard',
     display: 'standalone',
     background_color: '#ffffff',
-    theme_color: '#1565c0',
+    theme_color: '#c3282f',
     icons: [
       {
         src: '/icon-192x192.png',

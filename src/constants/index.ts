@@ -1,10 +1,10 @@
 export const SITE_CONFIG = {
   name: 'Portal',
-  description: 'Sistem Presensi Modern untuk PCF',
-  url: 'https://presensipcf.com',
-  ogImage: 'https://presensipcf.com/og.jpg',
+  description: 'Sistem Presensi Modern Mediapro Digital Creative Limited',
+  url: 'https://hrdbest.ekalliptus.com',
+  ogImage: 'https://hrdbest.ekalliptus.com/og.jpg',
   links: {
-    github: 'https://github.com/presensipcf',
+    github: 'https://github.com/anrdart/hrdbest',
   },
 } as const;
 

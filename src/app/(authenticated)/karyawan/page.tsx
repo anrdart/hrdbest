@@ -29,7 +29,7 @@ interface KaryawanItem {
 /* ───── helpers ───── */
 const ROLE_COLORS: Record<string, { bg: string; color: string }> = {
   super_admin: { bg: '#f5f3ff', color: '#7c3aed' },
-  hrd: { bg: '#eff6ff', color: '#1565c0' },
+  hrd: { bg: '#fceaeb', color: '#c3282f' },
   manager: { bg: '#ecfeff', color: '#0891b2' },
   employee: { bg: '#f1f5f9', color: '#475569' },
 };
@@ -139,11 +139,11 @@ export default function KaryawanPage() {
   /* ─── CRUD handlers ─── */
   const handleAdd = async () => {
     if (!formNik || !formName || !formEmail || !formPassword) {
-      Swal.fire({ icon: 'warning', title: 'Lengkapi Form', text: 'NIK, Nama, Email, dan Password wajib diisi.', confirmButtonColor: '#1565c0' });
+      Swal.fire({ icon: 'warning', title: 'Lengkapi Form', text: 'NIK, Nama, Email, dan Password wajib diisi.', confirmButtonColor: '#c3282f' });
       return;
     }
     if (formPassword.length < 6) {
-      Swal.fire({ icon: 'warning', title: 'Password Terlalu Pendek', text: 'Minimal 6 karakter.', confirmButtonColor: '#1565c0' });
+      Swal.fire({ icon: 'warning', title: 'Password Terlalu Pendek', text: 'Minimal 6 karakter.', confirmButtonColor: '#c3282f' });
       return;
     }
     const token = authService.getToken();
@@ -161,7 +161,7 @@ export default function KaryawanPage() {
         closeModals();
         fetchKaryawan();
       } else {
-        Swal.fire({ icon: 'error', title: 'Gagal', text: data.message, confirmButtonColor: '#1565c0' });
+        Swal.fire({ icon: 'error', title: 'Gagal', text: data.message, confirmButtonColor: '#c3282f' });
       }
     } catch {
       Swal.fire({ icon: 'error', title: 'Error', text: 'Terjadi kesalahan jaringan', confirmButtonColor: '#ef4444' });
@@ -173,7 +173,7 @@ export default function KaryawanPage() {
   const handleEdit = async () => {
     if (!editingKaryawan) return;
     if (!formName || !formEmail) {
-      Swal.fire({ icon: 'warning', title: 'Lengkapi Form', text: 'Nama dan Email wajib diisi.', confirmButtonColor: '#1565c0' });
+      Swal.fire({ icon: 'warning', title: 'Lengkapi Form', text: 'Nama dan Email wajib diisi.', confirmButtonColor: '#c3282f' });
       return;
     }
     const token = authService.getToken();
@@ -191,7 +191,7 @@ export default function KaryawanPage() {
         closeModals();
         fetchKaryawan();
       } else {
-        Swal.fire({ icon: 'error', title: 'Gagal', text: data.message, confirmButtonColor: '#1565c0' });
+        Swal.fire({ icon: 'error', title: 'Gagal', text: data.message, confirmButtonColor: '#c3282f' });
       }
     } catch {
       Swal.fire({ icon: 'error', title: 'Error', text: 'Terjadi kesalahan jaringan', confirmButtonColor: '#ef4444' });
@@ -240,7 +240,7 @@ export default function KaryawanPage() {
       inputPlaceholder: 'Minimal 6 karakter',
       inputAttributes: { minlength: '6', autocapitalize: 'off', autocorrect: 'off' },
       showCancelButton: true,
-      confirmButtonColor: '#1565c0',
+      confirmButtonColor: '#c3282f',
       cancelButtonColor: '#64748b',
       confirmButtonText: 'Reset Password',
       cancelButtonText: 'Batal',
@@ -283,7 +283,7 @@ export default function KaryawanPage() {
   if (isLoading) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100dvh' }}>
-        <IconLoader2 size={32} color="#1565c0" className="animate-spin" />
+        <IconLoader2 size={32} color="#c3282f" className="animate-spin" />
       </div>
     );
   }
@@ -293,7 +293,7 @@ export default function KaryawanPage() {
       <div style={{ marginBottom: '28px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
         <div>
           <h1 style={{ fontSize: '22px', fontWeight: 800, color: '#0f172a', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <IconUsers size={24} color="#1565c0" />
+            <IconUsers size={24} color="#c3282f" />
             Manajemen Karyawan
           </h1>
           <p style={{ fontSize: '14px', color: '#64748b' }}>Kelola data karyawan, role, dan akses sistem.</p>
@@ -302,7 +302,7 @@ export default function KaryawanPage() {
           onClick={openAddModal}
           style={{
             display: 'flex', alignItems: 'center', gap: '8px',
-            background: '#1565c0', color: '#ffffff',
+            background: '#c3282f', color: '#ffffff',
             border: 'none', borderRadius: '8px',
             padding: '10px 20px', fontSize: '13px', fontWeight: 700,
             cursor: 'pointer',
@@ -315,7 +315,7 @@ export default function KaryawanPage() {
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginBottom: '24px' }}>
         {[
-          { label: 'Total Karyawan', value: karyawanList.length, icon: <IconUsers size={20} color="#1565c0" />, bg: '#eff6ff', accent: '#1565c0' },
+          { label: 'Total Karyawan', value: karyawanList.length, icon: <IconUsers size={20} color="#c3282f" />, bg: '#fceaeb', accent: '#c3282f' },
           { label: 'Total HRD', value: totalHrd, icon: <IconUsers size={20} color="#7c3aed" />, bg: '#f5f3ff', accent: '#7c3aed' },
           { label: 'Total Manager', value: totalManager, icon: <IconUsers size={20} color="#0891b2" />, bg: '#ecfeff', accent: '#0891b2' },
         ].map((s) => (
@@ -391,7 +391,7 @@ export default function KaryawanPage() {
                         <button
                           onClick={() => openEditModal(k)}
                           title="Edit"
-                          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', borderRadius: '6px', border: '1px solid #e2e8f0', background: '#ffffff', cursor: 'pointer', color: '#1565c0' }}
+                          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', borderRadius: '6px', border: '1px solid #e2e8f0', background: '#ffffff', cursor: 'pointer', color: '#c3282f' }}
                         >
                           <IconEdit size={15} />
                         </button>
@@ -444,7 +444,7 @@ export default function KaryawanPage() {
             </div>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '24px' }}>
               <button onClick={closeModals} style={{ padding: '10px 20px', fontSize: '13px', fontWeight: 700, borderRadius: '8px', border: '1px solid #e2e8f0', background: '#ffffff', color: '#64748b', cursor: 'pointer' }}>Batal</button>
-              <button onClick={handleAdd} disabled={isSubmitting} style={{ padding: '10px 20px', fontSize: '13px', fontWeight: 700, borderRadius: '8px', border: 'none', background: '#1565c0', color: '#ffffff', cursor: isSubmitting ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: '8px', opacity: isSubmitting ? 0.7 : 1 }}>
+              <button onClick={handleAdd} disabled={isSubmitting} style={{ padding: '10px 20px', fontSize: '13px', fontWeight: 700, borderRadius: '8px', border: 'none', background: '#c3282f', color: '#ffffff', cursor: isSubmitting ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: '8px', opacity: isSubmitting ? 0.7 : 1 }}>
                 {isSubmitting && <IconLoader2 size={14} className="animate-spin" />}
                 Simpan
               </button>
@@ -480,7 +480,7 @@ export default function KaryawanPage() {
             </div>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '24px' }}>
               <button onClick={closeModals} style={{ padding: '10px 20px', fontSize: '13px', fontWeight: 700, borderRadius: '8px', border: '1px solid #e2e8f0', background: '#ffffff', color: '#64748b', cursor: 'pointer' }}>Batal</button>
-              <button onClick={handleEdit} disabled={isSubmitting} style={{ padding: '10px 20px', fontSize: '13px', fontWeight: 700, borderRadius: '8px', border: 'none', background: '#1565c0', color: '#ffffff', cursor: isSubmitting ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: '8px', opacity: isSubmitting ? 0.7 : 1 }}>
+              <button onClick={handleEdit} disabled={isSubmitting} style={{ padding: '10px 20px', fontSize: '13px', fontWeight: 700, borderRadius: '8px', border: 'none', background: '#c3282f', color: '#ffffff', cursor: isSubmitting ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: '8px', opacity: isSubmitting ? 0.7 : 1 }}>
                 {isSubmitting && <IconLoader2 size={14} className="animate-spin" />}
                 Simpan Perubahan
               </button>

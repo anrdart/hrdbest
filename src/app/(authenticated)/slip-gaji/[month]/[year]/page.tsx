@@ -40,7 +40,7 @@ const DetailRow = ({ label, center = '', right, isTotal = false, isSubData = fal
         {center}
       </span>
     )}
-    <span style={{ color: isTotal ? '#1565c0' : '#1e293b', fontWeight: isTotal ? 800 : 700, flex: 1, textAlign: 'right' }}>
+    <span style={{ color: isTotal ? '#c3282f' : '#1e293b', fontWeight: isTotal ? 800 : 700, flex: 1, textAlign: 'right' }}>
       {right}
     </span>
   </div>
@@ -79,7 +79,7 @@ export default function SlipGajiDetailPage() {
           icon: 'error',
           title: 'Gagal',
           text: 'Gagal mengambil rincian slip gaji.',
-          confirmButtonColor: '#1565c0',
+          confirmButtonColor: '#c3282f',
         }).then(() => router.back());
       } finally {
         setIsLoading(false);
@@ -130,7 +130,7 @@ export default function SlipGajiDetailPage() {
   if (isLoading) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100dvh', gap: '12px' }}>
-        <div className="animate-spin" style={{ width: '36px', height: '36px', border: '3px solid #e2e8f0', borderTopColor: '#1565c0', borderRadius: '50%' }}></div>
+        <div className="animate-spin" style={{ width: '36px', height: '36px', border: '3px solid #e2e8f0', borderTopColor: '#c3282f', borderRadius: '50%' }}></div>
         <p style={{ fontSize: '14px', fontWeight: 600, color: '#64748b' }}>Menghitung Gaji Anda...</p>
       </div>
     );
@@ -161,7 +161,7 @@ export default function SlipGajiDetailPage() {
           onClick={handleDownload}
           style={{
             display: 'flex', alignItems: 'center', gap: '8px',
-            padding: '10px 18px', background: '#1565c0', color: '#ffffff',
+            padding: '10px 18px', background: '#c3282f', color: '#ffffff',
             border: 'none', borderRadius: '10px', cursor: 'pointer',
             fontSize: '13px', fontWeight: 700,
             boxShadow: '0 2px 8px rgba(21,101,192,0.25)',
@@ -330,7 +330,7 @@ export default function SlipGajiDetailPage() {
                 </div>
                 <div style={{ textAlign: 'right' }}>
                   <p style={{ fontSize: '11px', color: '#64748b', marginBottom: '20px', fontStyle: 'italic' }}>Dicetak secara digital</p>
-                  <p style={{ fontSize: '14px', fontWeight: 800, color: '#1e293b', margin: 0 }}>CV. MAKMUR PERMATA</p>
+                  <p style={{ fontSize: '14px', fontWeight: 800, color: '#1e293b', margin: 0 }}>Mediapro Digital Creative Limited</p>
                 </div>
               </div>
             </div>

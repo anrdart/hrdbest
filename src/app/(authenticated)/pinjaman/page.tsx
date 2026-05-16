@@ -34,7 +34,7 @@ export default function PinjamanPage() {
   }) || [];
 
   const tipeIcon = (tipe: string) => {
-    if (tipe === 'PJP') return { icon: <IconReceipt2 size={20} />, bg: '#eff6ff', color: '#2563eb' };
+    if (tipe === 'PJP') return { icon: <IconReceipt2 size={20} />, bg: '#fceaeb', color: '#2563eb' };
     if (tipe === 'KASBON') return { icon: <IconCash size={20} />, bg: '#fefce8', color: '#ca8a04' };
     return { icon: <IconCreditCard size={20} />, bg: '#f0fdf4', color: '#16a34a' };
   };
@@ -52,7 +52,7 @@ export default function PinjamanPage() {
           onClick={() => setIsSimulatorOpen(true)}
           style={{
             display: 'flex', alignItems: 'center', gap: '8px',
-            padding: '10px 18px', background: '#1565c0', color: '#ffffff',
+            padding: '10px 18px', background: '#c3282f', color: '#ffffff',
             border: 'none', borderRadius: '10px', cursor: 'pointer',
             fontSize: '13px', fontWeight: 700,
           }}
@@ -63,14 +63,14 @@ export default function PinjamanPage() {
 
       {isLoading ? (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', padding: '60px', color: '#94a3b8' }}>
-          <IconLoader2 size={28} className="animate-spin" color="#1565c0" />
+          <IconLoader2 size={28} className="animate-spin" color="#c3282f" />
           <p style={{ fontSize: '14px' }}>Memuat data pinjaman...</p>
         </div>
       ) : (
         <>
           {/* Summary card */}
           <div style={{
-            background: 'linear-gradient(135deg, #0d47a1 0%, #1a237e 100%)',
+            background: 'linear-gradient(135deg, #a11f25 0%, #a11f25 100%)',
             borderRadius: '20px',
             padding: '28px 32px',
             color: '#ffffff',
@@ -102,7 +102,7 @@ export default function PinjamanPage() {
                     borderRadius: '8px',
                     border: 'none',
                     background: activeTab === tab ? '#ffffff' : 'transparent',
-                    color: activeTab === tab ? '#1565c0' : '#64748b',
+                    color: activeTab === tab ? '#c3282f' : '#64748b',
                     fontSize: '13px', fontWeight: 700, cursor: 'pointer',
                     boxShadow: activeTab === tab ? '0 1px 4px rgba(0,0,0,0.08)' : 'none',
                     transition: 'all 0.15s',
@@ -180,7 +180,7 @@ export default function PinjamanPage() {
                         <td style={{ padding: '14px 16px', fontSize: '13px', color: '#475569' }}>
                           {loan.angsuran > 0 ? formatCurrency(loan.angsuran) : '—'}
                         </td>
-                        <td style={{ padding: '14px 16px', fontSize: '13px', fontWeight: 800, color: isLunas ? '#22c55e' : '#1565c0' }}>
+                        <td style={{ padding: '14px 16px', fontSize: '13px', fontWeight: 800, color: isLunas ? '#22c55e' : '#c3282f' }}>
                           {isLunas ? '—' : formatCurrency(loan.sisa_pinjaman)}
                         </td>
                         <td style={{ padding: '14px 16px' }}>

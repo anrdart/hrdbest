@@ -125,7 +125,7 @@ export default function HistoryPage() {
       <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', overflow: 'hidden' }}>
         {isLoading ? (
           <div style={{ padding: '60px', textAlign: 'center', color: '#94a3b8', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
-            <IconLoader2 size={28} className="animate-spin" color="#1565c0" />
+            <IconLoader2 size={28} className="animate-spin" color="#c3282f" />
             <p style={{ fontSize: '14px' }}>Memuat data presensi...</p>
           </div>
         ) : filtered.length === 0 ? (

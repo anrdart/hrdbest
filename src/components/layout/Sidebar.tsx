@@ -18,7 +18,6 @@ import {
   IconLoader2,
   IconChevronLeft,
   IconChevronRight,
-  IconBuildingSkyscraper,
 } from '@tabler/icons-react';
 import { authService, Employee } from '@/services/auth.service';
 import Swal from 'sweetalert2';
@@ -97,7 +96,7 @@ export default function Sidebar() {
       text: 'Anda perlu login kembali untuk mengakses portal.',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#1565c0',
+      confirmButtonColor: '#c3282f',
       cancelButtonColor: '#94a3b8',
       confirmButtonText: 'Ya, Keluar',
       cancelButtonText: 'Batal',
@@ -123,7 +122,7 @@ export default function Sidebar() {
 
   const roleBadgeColor: Record<string, string> = {
     super_admin: '#7c3aed',
-    hrd: '#1565c0',
+    hrd: '#c3282f',
     manager: '#0891b2',
   };
 
@@ -156,23 +155,10 @@ export default function Sidebar() {
           minHeight: '72px',
         }}
       >
-        <div
-          style={{
-            width: '36px',
-            height: '36px',
-            background: 'linear-gradient(135deg, #1565c0, #0d47a1)',
-            borderRadius: '10px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexShrink: 0,
-          }}
-        >
-          <IconBuildingSkyscraper size={20} color="#ffffff" stroke={2} />
-        </div>
+        <img src="/logo-color-64.webp" alt="Logo" style={{ width: '36px', height: '36px', borderRadius: '10px', flexShrink: 0 }} />
         {!collapsed && (
           <div>
-            <p style={{ fontSize: '13px', fontWeight: 800, color: '#0f172a', lineHeight: 1.2 }}>PT PCA</p>
+            <p style={{ fontSize: '13px', fontWeight: 800, color: '#0f172a', lineHeight: 1.2 }}>Mediapro Digital</p>
             <p style={{ fontSize: '10px', color: '#64748b', fontWeight: 500 }}>Portal Karyawan</p>
           </div>
         )}
@@ -193,22 +179,22 @@ export default function Sidebar() {
                 gap: '10px',
                 padding: collapsed ? '10px 0' : '10px 12px',
                 borderRadius: '10px',
-                background: active ? '#eff6ff' : 'transparent',
+                background: active ? '#fceaeb' : 'transparent',
                 border: 'none',
                 cursor: 'pointer',
                 width: '100%',
                 justifyContent: collapsed ? 'center' : 'flex-start',
                 transition: 'all 0.15s ease',
-                color: active ? '#1565c0' : '#475569',
+                color: active ? '#c3282f' : '#475569',
               }}
             >
-              <span style={{ color: active ? '#1565c0' : '#64748b', flexShrink: 0 }}>{item.icon}</span>
+              <span style={{ color: active ? '#c3282f' : '#64748b', flexShrink: 0 }}>{item.icon}</span>
               {!collapsed && (
                 <span
                   style={{
                     fontSize: '13.5px',
                     fontWeight: active ? 700 : 500,
-                    color: active ? '#1565c0' : '#475569',
+                    color: active ? '#c3282f' : '#475569',
                     whiteSpace: 'nowrap',
                   }}
                 >
@@ -222,7 +208,7 @@ export default function Sidebar() {
                     width: '4px',
                     height: '4px',
                     borderRadius: '50%',
-                    background: '#1565c0',
+                    background: '#c3282f',
                   }}
                 />
               )}
@@ -267,7 +253,7 @@ export default function Sidebar() {
             width: '34px',
             height: '34px',
             borderRadius: '50%',
-            background: 'linear-gradient(135deg, #1565c0, #0d47a1)',
+            background: 'linear-gradient(135deg, #c3282f, #a11f25)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -289,7 +275,7 @@ export default function Sidebar() {
                 fontSize: '10px',
                 fontWeight: 700,
                 color: '#ffffff',
-                background: roleBadgeColor[role] || '#1565c0',
+                background: roleBadgeColor[role] || '#c3282f',
                 padding: '1px 6px',
                 borderRadius: '4px',
               }}

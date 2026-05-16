@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   },
   description: SITE_CONFIG.description,
   icons: {
-    icon: "/favicon.ico",
+    icon: "/logo-color-64.webp",
   },
 };
 

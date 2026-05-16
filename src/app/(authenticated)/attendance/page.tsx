@@ -75,7 +75,7 @@ export default function AttendancePage() {
     const faceReady = isModelsLoaded && isFaceDetected;
     const disabled = !isCameraReady || !location || !faceReady || isSubmitting;
     if (hasCheckedIn) return { label: faceReady ? 'ABSEN PULANG' : 'POSISIKAN WAJAH', disabled, color: '#ef4444', status: 'pulang' as const };
-    return { label: faceReady ? 'ABSEN MASUK' : 'POSISIKAN WAJAH', disabled, color: '#1565c0', status: 'masuk' as const };
+    return { label: faceReady ? 'ABSEN MASUK' : 'POSISIKAN WAJAH', disabled, color: '#c3282f', status: 'masuk' as const };
   };
   const btn = getButtonState();
 
@@ -98,7 +98,7 @@ export default function AttendancePage() {
     if (!token) { router.push('/'); return; }
     const image = captureImage();
     if (!image) {
-      Swal.fire({ icon: 'error', title: 'Oops...', text: 'Gagal mengambil foto. Coba lagi.', confirmButtonColor: '#1565c0' });
+      Swal.fire({ icon: 'error', title: 'Oops...', text: 'Gagal mengambil foto. Coba lagi.', confirmButtonColor: '#c3282f' });
       return;
     }
     setIsSubmitting(true);
@@ -231,7 +231,7 @@ export default function AttendancePage() {
                 return <div key={c} style={styles} />;
               })}
               {!isFaceDetected && isModelsLoaded && (
-                <div style={{ position: 'absolute', left: 10, right: 10, height: '2px', background: 'linear-gradient(90deg, transparent, #3b82f6, transparent)', boxShadow: '0 0 8px #3b82f6', animation: 'scan 2.5s linear infinite', top: '50%' }} />
+                <div style={{ position: 'absolute', left: 10, right: 10, height: '2px', background: 'linear-gradient(90deg, transparent, #d2a418, transparent)', boxShadow: '0 0 8px #d2a418', animation: 'scan 2.5s linear infinite', top: '50%' }} />
               )}
             </div>
           </div>
@@ -271,7 +271,7 @@ export default function AttendancePage() {
           {/* Loading overlay */}
           {!isCameraReady && (
             <div style={{ position: 'absolute', inset: 0, background: '#111827', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '12px' }}>
-              <IconLoader2 size={32} color="#3b82f6" className="animate-spin" />
+              <IconLoader2 size={32} color="#d2a418" className="animate-spin" />
               <p style={{ color: '#94a3b8', fontSize: '14px' }}>Menyiapkan kamera...</p>
             </div>
           )}
@@ -326,7 +326,7 @@ export default function AttendancePage() {
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <span style={{ fontSize: '12px', color: '#64748b' }}>Jam Kerja</span>
-                  <span style={{ fontSize: '13px', fontWeight: 800, color: '#1565c0' }}>{jamMasuk} – {jamPulang}</span>
+                  <span style={{ fontSize: '13px', fontWeight: 800, color: '#c3282f' }}>{jamMasuk} – {jamPulang}</span>
                 </div>
               </div>
             )}

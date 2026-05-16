@@ -46,7 +46,7 @@ export default function PinjamanDetailPage() {
   if (isLoading) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100dvh', flexDirection: 'column', gap: '12px' }}>
-        <IconLoader2 size={32} color="#1565c0" className="animate-spin" />
+        <IconLoader2 size={32} color="#c3282f" className="animate-spin" />
         <p style={{ fontSize: '14px', color: '#64748b' }}>Memuat rincian pinjaman...</p>
       </div>
     );
@@ -62,7 +62,7 @@ export default function PinjamanDetailPage() {
 
   const tipeIcon = type === 'KASBON'
     ? { icon: <IconCash size={26} />, bg: '#fefce8', color: '#ca8a04' }
-    : { icon: <IconCreditCard size={26} />, bg: '#eff6ff', color: '#1565c0' };
+    : { icon: <IconCreditCard size={26} />, bg: '#fceaeb', color: '#c3282f' };
 
   return (
     <div style={{ padding: '32px 36px', maxWidth: '1100px' }}>
@@ -105,10 +105,10 @@ export default function PinjamanDetailPage() {
             <div style={{ marginBottom: '20px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
                 <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 600 }}>Progres Pembayaran</span>
-                <span style={{ fontSize: '12px', fontWeight: 800, color: '#1565c0' }}>{payPercent.toFixed(1)}%</span>
+                <span style={{ fontSize: '12px', fontWeight: 800, color: '#c3282f' }}>{payPercent.toFixed(1)}%</span>
               </div>
               <div style={{ height: '8px', background: '#f1f5f9', borderRadius: '4px', overflow: 'hidden' }}>
-                <div style={{ width: `${payPercent}%`, height: '100%', background: 'linear-gradient(90deg, #1565c0, #3b82f6)', borderRadius: '4px', transition: 'width 1s' }} />
+                <div style={{ width: `${payPercent}%`, height: '100%', background: 'linear-gradient(90deg, #c3282f, #d2a418)', borderRadius: '4px', transition: 'width 1s' }} />
               </div>
             </div>
 
