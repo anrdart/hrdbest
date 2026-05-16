@@ -60,8 +60,8 @@ export default function LoginPage() {
 
         <div style={{ position: 'relative', zIndex: 1, textAlign: 'center' }}>
           {/* Logo */}
-          <div style={{ margin: '0 auto 24px', maxWidth: '240px' }}>
-            <img src="/logo-text.webp" alt="Mediapro Digital Creative Limited" style={{ width: '100%', height: 'auto' }} />
+          <div style={{ margin: '0 auto 24px', maxWidth: '240px', background: '#ffffff', borderRadius: '16px', padding: '16px 20px' }}>
+            <img src="/logo-text.webp" alt="Mediapro Digital Creative Limited" style={{ width: '100%', height: 'auto', display: 'block' }} />
           </div>
 
           <h1 style={{ fontSize: '26px', fontWeight: 900, color: '#ffffff', marginBottom: '8px', letterSpacing: '-0.3px' }}>
